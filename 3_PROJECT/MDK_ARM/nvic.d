@@ -1,0 +1,16 @@
+.\nvic.o: ..\..\4_FUNATION\NVIC.c
+.\nvic.o: ..\..\3_PROJECT\stm32f10x.h
+.\nvic.o: ..\..\3_PROJECT\stm32f10x_conf.h
+.\nvic.o: ..\..\1_FWLIB_3_5_0\inc\stm32f10x_crc.h
+.\nvic.o: ..\..\3_PROJECT\stm32f10x.h
+.\nvic.o: ..\..\3_PROJECT\stm32f10x_conf.h
+.\nvic.o: ..\..\0_CORE\core_cm3.h
+.\nvic.o: D:\software\keil5\ARM\ARMCC\Bin\..\include\stdint.h
+.\nvic.o: ..\..\3_PROJECT\system_stm32f10x.h
+.\nvic.o: ..\..\1_FWLIB_3_5_0\inc\stm32f10x_gpio.h
+.\nvic.o: ..\..\3_PROJECT\stm32f10x.h
+.\nvic.o: ..\..\1_FWLIB_3_5_0\inc\stm32f10x_rcc.h
+.\nvic.o: ..\..\3_PROJECT\stm32f10x.h
+.\nvic.o: ..\..\3_PROJECT\GPIO_Funation.h
+.\nvic.o: ..\..\3_PROJECT\NVIC.h
+.\nvic.o: D:\software\keil5\ARM\ARMCC\Bin\..\include\stdio.h
