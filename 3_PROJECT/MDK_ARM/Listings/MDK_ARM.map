@@ -33,8 +33,8 @@ Section Cross References
     main.o(i.main) refers to zongzhixin.o(i.ZhuJi_Init) for ZhuJi_Init
     main.o(i.main) refers to stm32f10x_usart.o(i.USART_SendData) for USART_SendData
     main.o(i.main) refers to zongzhixin.o(i.ZongXunHuan) for ZongXunHuan
-    main.o(i.main) refers to usart_funation.o(i.ZhuJi_ShuJuChuLi2) for ZhuJi_ShuJuChuLi2
-    main.o(i.main) refers to usart_funation.o(i.ZhuJi2_ShuJuChuLi2) for ZhuJi2_ShuJuChuLi2
+    main.o(i.main) refers to usart_funation.o(i.PC_ProcessRecvData) for PC_ProcessRecvData
+    main.o(i.main) refers to usart_funation.o(i.Slave_ProcessRecvData) for Slave_ProcessRecvData
     main.o(i.main) refers to stm32f10x_gpio.o(i.GPIO_ReadInputDataBit) for GPIO_ReadInputDataBit
     main.o(i.main) refers to stm32f10x_gpio.o(i.GPIO_WriteBit) for GPIO_WriteBit
     main.o(i.main) refers to tim_funation.o(.data) for Time_500Ms_Flag
@@ -102,24 +102,33 @@ Section Cross References
     tim_funation.o(i.Tim_Init_PeiZhi) refers to stm32f10x_tim.o(i.TIM_Cmd) for TIM_Cmd
     usart_funation.o(i.Num_Data) refers to stm32f10x_usart.o(i.USART_SendData) for USART_SendData
     usart_funation.o(i.Num_Data) refers to usart_funation.o(.data) for ZhongDuan_TX_Flag
+    usart_funation.o(i.PC_ProcessRecvData) refers to crc_funation.o(i.crc16) for crc16
+    usart_funation.o(i.PC_ProcessRecvData) refers to usart_funation.o(.data) for PC_ProcessRecvData_i
+    usart_funation.o(i.PC_ProcessRecvData) refers to usart_funation.o(.bss) for PC_RxHuanCun
+    usart_funation.o(i.PC_ProcessRecvData) refers to zongzhixin.o(.bss) for ZhiLin_ChangDu
+    usart_funation.o(i.PC_RecvData) refers to usart_funation.o(.bss) for PC_RxHuanCun_i
+    usart_funation.o(i.Slave_ProcessRecvData) refers to crc_funation.o(i.crc16) for crc16
+    usart_funation.o(i.Slave_ProcessRecvData) refers to usart_funation.o(.data) for Slave_ProcessRecvData_i
+    usart_funation.o(i.Slave_ProcessRecvData) refers to usart_funation.o(.bss) for Slave_RxHuanCun
+    usart_funation.o(i.Slave_ProcessRecvData) refers to zongzhixin.o(.bss) for ZhiLin2_ChangDu
+    usart_funation.o(i.Slave_RecvData) refers to usart_funation.o(.bss) for Slave_RxHuanCun_i
     usart_funation.o(i.Str_Data) refers to stm32f10x_usart.o(i.USART_SendData) for USART_SendData
     usart_funation.o(i.TonXunFaSong) refers to stm32f10x_usart.o(i.USART_SendData) for USART_SendData
     usart_funation.o(i.TonXunFaSong) refers to crc_funation.o(i.crc16) for crc16
-    usart_funation.o(i.TonXunFaSong) refers to usart_funation.o(.data) for DianNaoFaSong_i
     usart_funation.o(i.TonXunFaSong) refers to usart_funation.o(.bss) for CRC_HuanCun
     usart_funation.o(i.USART1_IRQHandler) refers to stm32f10x_usart.o(i.USART_GetITStatus) for USART_GetITStatus
     usart_funation.o(i.USART1_IRQHandler) refers to stm32f10x_usart.o(i.USART_ReceiveData) for USART_ReceiveData
-    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(i.ZhuJi_ShuJuChuLi) for ZhuJi_ShuJuChuLi
+    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(i.PC_RecvData) for PC_RecvData
     usart_funation.o(i.USART1_IRQHandler) refers to stm32f10x_usart.o(i.USART_ClearITPendingBit) for USART_ClearITPendingBit
-    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(.data) for RxBuffer1
-    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(.bss) for DianNaoJieShou_HuanCun_i
+    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(.data) for RxData1
+    usart_funation.o(i.USART1_IRQHandler) refers to usart_funation.o(.bss) for PC_RxHuanCun_i
     usart_funation.o(i.USART2_IRQHandler) refers to stm32f10x_usart.o(i.USART_GetITStatus) for USART_GetITStatus
     usart_funation.o(i.USART2_IRQHandler) refers to stm32f10x_usart.o(i.USART_ReceiveData) for USART_ReceiveData
-    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(i.ZhuJi2_ShuJuChuLi) for ZhuJi2_ShuJuChuLi
+    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(i.Slave_RecvData) for Slave_RecvData
     usart_funation.o(i.USART2_IRQHandler) refers to stm32f10x_usart.o(i.USART_ClearITPendingBit) for USART_ClearITPendingBit
     usart_funation.o(i.USART2_IRQHandler) refers to zongzhixin.o(.data) for AnWeiSouXun_Flag
-    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(.data) for RxBuffer2
-    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(.bss) for DianNaoJieShou2_HuanCun_i
+    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(.data) for RxData2
+    usart_funation.o(i.USART2_IRQHandler) refers to usart_funation.o(.bss) for Slave_RxHuanCun_i
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd) for RCC_APB2PeriphClockCmd
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_usart.o(i.USART_DeInit) for USART_DeInit
@@ -127,19 +136,7 @@ Section Cross References
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_usart.o(i.USART_ITConfig) for USART_ITConfig
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_usart.o(i.USART_Cmd) for USART_Cmd
     usart_funation.o(i.USART_InIt_PeiZhi) refers to stm32f10x_usart.o(i.USART_ClearITPendingBit) for USART_ClearITPendingBit
-    usart_funation.o(i.USART_InIt_PeiZhi) refers to usart_funation.o(.bss) for DianNaoJieShou_HuanCun
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi) refers to usart_funation.o(.data) for ZhuJi2_ShuJuChuLi_i
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi) refers to usart_funation.o(.bss) for DianNaoJieShou2_HuanCun_i
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi2) refers to crc_funation.o(i.crc16) for crc16
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi2) refers to usart_funation.o(.data) for ZhuJi2_ShuJuChuLi2_i
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi2) refers to usart_funation.o(.bss) for DianNaoJieShou2_HuanCun
-    usart_funation.o(i.ZhuJi2_ShuJuChuLi2) refers to zongzhixin.o(.bss) for ZhiLin2_ChangDu
-    usart_funation.o(i.ZhuJi_ShuJuChuLi) refers to usart_funation.o(.data) for ZhuJi_ShuJuChuLi_i
-    usart_funation.o(i.ZhuJi_ShuJuChuLi) refers to usart_funation.o(.bss) for DianNaoJieShou_HuanCun_i
-    usart_funation.o(i.ZhuJi_ShuJuChuLi2) refers to crc_funation.o(i.crc16) for crc16
-    usart_funation.o(i.ZhuJi_ShuJuChuLi2) refers to usart_funation.o(.data) for ZhuJi_ShuJuChuLi2_i
-    usart_funation.o(i.ZhuJi_ShuJuChuLi2) refers to usart_funation.o(.bss) for DianNaoJieShou_HuanCun
-    usart_funation.o(i.ZhuJi_ShuJuChuLi2) refers to zongzhixin.o(.bss) for ZhiLin_ChangDu
+    usart_funation.o(i.USART_InIt_PeiZhi) refers to usart_funation.o(.bss) for PC_RxHuanCun
     flish_funation.o(i.Flash_Write_2K) refers to stm32f10x_flash.o(i.FLASH_Unlock) for FLASH_Unlock
     flish_funation.o(i.Flash_Write_2K) refers to stm32f10x_flash.o(i.FLASH_ClearFlag) for FLASH_ClearFlag
     flish_funation.o(i.Flash_Write_2K) refers to stm32f10x_flash.o(i.FLASH_ErasePage) for FLASH_ErasePage
@@ -158,7 +155,6 @@ Section Cross References
     flish_funation.o(i.flash_write2) refers to flish_funation.o(.constdata) for .constdata
     zongzhixin.o(i.ZhuJi_Init) refers to flish_funation.o(i.Flash_Write_2K) for Flash_Write_2K
     zongzhixin.o(i.ZhuJi_Init) refers to flish_funation.o(i.Flash_Write_Str) for Flash_Write_Str
-    zongzhixin.o(i.ZhuJi_Init) refers to zongzhixin.o(.data) for ZhuJi_Init_i
     zongzhixin.o(i.ZhuJi_Init) refers to flish_funation.o(.bss) for Flash_ChengXu_Data
     zongzhixin.o(i.ZhuJi_Init) refers to zongzhixin.o(.bss) for GongNeng_HuanCun
     zongzhixin.o(i.ZongXunHuan) refers to usart_funation.o(i.TonXunFaSong) for TonXunFaSong
@@ -636,66 +632,66 @@ Image Symbol Table
     i.NVIC_Init                              0x08000d2c   Section        0  misc.o(i.NVIC_Init)
     i.NVIC_Init_PeiZhi                       0x08000d9c   Section        0  nvic_funation.o(i.NVIC_Init_PeiZhi)
     i.NVIC_PriorityGroupConfig               0x08000e18   Section        0  misc.o(i.NVIC_PriorityGroupConfig)
-    i.PendSV_Handler                         0x08000e2c   Section        0  stm32f10x_it.o(i.PendSV_Handler)
-    i.RCC_APB1PeriphClockCmd                 0x08000e30   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
-    i.RCC_APB1PeriphResetCmd                 0x08000e50   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd)
-    i.RCC_APB2PeriphClockCmd                 0x08000e70   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    i.RCC_APB2PeriphResetCmd                 0x08000e90   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphResetCmd)
-    i.RCC_GetClocksFreq                      0x08000eb0   Section        0  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
-    i.SVC_Handler                            0x08000f84   Section        0  stm32f10x_it.o(i.SVC_Handler)
-    i.SetSysClock                            0x08000f86   Section        0  system_stm32f10x.o(i.SetSysClock)
-    SetSysClock                              0x08000f87   Thumb Code     8  system_stm32f10x.o(i.SetSysClock)
-    i.SetSysClockTo72                        0x08000f90   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
-    SetSysClockTo72                          0x08000f91   Thumb Code   214  system_stm32f10x.o(i.SetSysClockTo72)
-    i.SysTick_Handler                        0x08001070   Section        0  stm32f10x_it.o(i.SysTick_Handler)
-    i.SystemInit                             0x08001074   Section        0  system_stm32f10x.o(i.SystemInit)
-    i.TIM3_IRQHandler                        0x080010d4   Section        0  tim_funation.o(i.TIM3_IRQHandler)
-    i.TIM_ClearFlag                          0x08001144   Section        0  stm32f10x_tim.o(i.TIM_ClearFlag)
-    i.TIM_ClearITPendingBit                  0x0800114a   Section        0  stm32f10x_tim.o(i.TIM_ClearITPendingBit)
-    i.TIM_Cmd                                0x08001150   Section        0  stm32f10x_tim.o(i.TIM_Cmd)
-    i.TIM_GetITStatus                        0x08001168   Section        0  stm32f10x_tim.o(i.TIM_GetITStatus)
-    i.TIM_ITConfig                           0x0800118a   Section        0  stm32f10x_tim.o(i.TIM_ITConfig)
-    i.TIM_TimeBaseInit                       0x0800119c   Section        0  stm32f10x_tim.o(i.TIM_TimeBaseInit)
-    i.Tim_Init_PeiZhi                        0x08001240   Section        0  tim_funation.o(i.Tim_Init_PeiZhi)
-    i.TonXunFaSong                           0x08001290   Section        0  usart_funation.o(i.TonXunFaSong)
-    i.USART1_IRQHandler                      0x08001320   Section        0  usart_funation.o(i.USART1_IRQHandler)
-    i.USART2_IRQHandler                      0x080013c8   Section        0  usart_funation.o(i.USART2_IRQHandler)
-    i.USART_ClearITPendingBit                0x08001490   Section        0  stm32f10x_usart.o(i.USART_ClearITPendingBit)
-    i.USART_Cmd                              0x080014ae   Section        0  stm32f10x_usart.o(i.USART_Cmd)
-    i.USART_DeInit                           0x080014c8   Section        0  stm32f10x_usart.o(i.USART_DeInit)
-    i.USART_GetITStatus                      0x08001564   Section        0  stm32f10x_usart.o(i.USART_GetITStatus)
-    i.USART_ITConfig                         0x080015b8   Section        0  stm32f10x_usart.o(i.USART_ITConfig)
-    i.USART_InIt_PeiZhi                      0x08001604   Section        0  usart_funation.o(i.USART_InIt_PeiZhi)
-    i.USART_Init                             0x0800170c   Section        0  stm32f10x_usart.o(i.USART_Init)
-    i.USART_ReceiveData                      0x080017e4   Section        0  stm32f10x_usart.o(i.USART_ReceiveData)
-    i.USART_SendData                         0x080017f0   Section        0  stm32f10x_usart.o(i.USART_SendData)
-    i.UsageFault_Handler                     0x0800184c   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
-    i.ZhuJi2_ShuJuChuLi                      0x08001850   Section        0  usart_funation.o(i.ZhuJi2_ShuJuChuLi)
-    i.ZhuJi2_ShuJuChuLi2                     0x080018cc   Section        0  usart_funation.o(i.ZhuJi2_ShuJuChuLi2)
-    i.ZhuJi_Init                             0x08001aac   Section        0  zongzhixin.o(i.ZhuJi_Init)
-    i.ZhuJi_ShuJuChuLi                       0x08001c6c   Section        0  usart_funation.o(i.ZhuJi_ShuJuChuLi)
-    i.ZhuJi_ShuJuChuLi2                      0x08001ce8   Section        0  usart_funation.o(i.ZhuJi_ShuJuChuLi2)
-    i.ZongXunHuan                            0x08001ed0   Section        0  zongzhixin.o(i.ZongXunHuan)
-    i.crc16                                  0x08002680   Section        0  crc_funation.o(i.crc16)
-    i.main                                   0x080026bc   Section        0  main.o(i.main)
+    i.PC_ProcessRecvData                     0x08000e2c   Section        0  usart_funation.o(i.PC_ProcessRecvData)
+    i.PC_RecvData                            0x08001014   Section        0  usart_funation.o(i.PC_RecvData)
+    i.PendSV_Handler                         0x08001068   Section        0  stm32f10x_it.o(i.PendSV_Handler)
+    i.RCC_APB1PeriphClockCmd                 0x0800106c   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
+    i.RCC_APB1PeriphResetCmd                 0x0800108c   Section        0  stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd)
+    i.RCC_APB2PeriphClockCmd                 0x080010ac   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    i.RCC_APB2PeriphResetCmd                 0x080010cc   Section        0  stm32f10x_rcc.o(i.RCC_APB2PeriphResetCmd)
+    i.RCC_GetClocksFreq                      0x080010ec   Section        0  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
+    i.SVC_Handler                            0x080011c0   Section        0  stm32f10x_it.o(i.SVC_Handler)
+    i.SetSysClock                            0x080011c2   Section        0  system_stm32f10x.o(i.SetSysClock)
+    SetSysClock                              0x080011c3   Thumb Code     8  system_stm32f10x.o(i.SetSysClock)
+    i.SetSysClockTo72                        0x080011cc   Section        0  system_stm32f10x.o(i.SetSysClockTo72)
+    SetSysClockTo72                          0x080011cd   Thumb Code   214  system_stm32f10x.o(i.SetSysClockTo72)
+    i.Slave_ProcessRecvData                  0x080012ac   Section        0  usart_funation.o(i.Slave_ProcessRecvData)
+    i.Slave_RecvData                         0x0800148c   Section        0  usart_funation.o(i.Slave_RecvData)
+    i.SysTick_Handler                        0x080014e0   Section        0  stm32f10x_it.o(i.SysTick_Handler)
+    i.SystemInit                             0x080014e4   Section        0  system_stm32f10x.o(i.SystemInit)
+    i.TIM3_IRQHandler                        0x08001544   Section        0  tim_funation.o(i.TIM3_IRQHandler)
+    i.TIM_ClearFlag                          0x080015b4   Section        0  stm32f10x_tim.o(i.TIM_ClearFlag)
+    i.TIM_ClearITPendingBit                  0x080015ba   Section        0  stm32f10x_tim.o(i.TIM_ClearITPendingBit)
+    i.TIM_Cmd                                0x080015c0   Section        0  stm32f10x_tim.o(i.TIM_Cmd)
+    i.TIM_GetITStatus                        0x080015d8   Section        0  stm32f10x_tim.o(i.TIM_GetITStatus)
+    i.TIM_ITConfig                           0x080015fa   Section        0  stm32f10x_tim.o(i.TIM_ITConfig)
+    i.TIM_TimeBaseInit                       0x0800160c   Section        0  stm32f10x_tim.o(i.TIM_TimeBaseInit)
+    i.Tim_Init_PeiZhi                        0x080016b0   Section        0  tim_funation.o(i.Tim_Init_PeiZhi)
+    i.TonXunFaSong                           0x08001700   Section        0  usart_funation.o(i.TonXunFaSong)
+    i.USART1_IRQHandler                      0x08001764   Section        0  usart_funation.o(i.USART1_IRQHandler)
+    i.USART2_IRQHandler                      0x080017f0   Section        0  usart_funation.o(i.USART2_IRQHandler)
+    i.USART_ClearITPendingBit                0x080018a0   Section        0  stm32f10x_usart.o(i.USART_ClearITPendingBit)
+    i.USART_Cmd                              0x080018be   Section        0  stm32f10x_usart.o(i.USART_Cmd)
+    i.USART_DeInit                           0x080018d8   Section        0  stm32f10x_usart.o(i.USART_DeInit)
+    i.USART_GetITStatus                      0x08001974   Section        0  stm32f10x_usart.o(i.USART_GetITStatus)
+    i.USART_ITConfig                         0x080019c8   Section        0  stm32f10x_usart.o(i.USART_ITConfig)
+    i.USART_InIt_PeiZhi                      0x08001a14   Section        0  usart_funation.o(i.USART_InIt_PeiZhi)
+    i.USART_Init                             0x08001b2c   Section        0  stm32f10x_usart.o(i.USART_Init)
+    i.USART_ReceiveData                      0x08001c04   Section        0  stm32f10x_usart.o(i.USART_ReceiveData)
+    i.USART_SendData                         0x08001c10   Section        0  stm32f10x_usart.o(i.USART_SendData)
+    i.UsageFault_Handler                     0x08001c6c   Section        0  stm32f10x_it.o(i.UsageFault_Handler)
+    i.ZhuJi_Init                             0x08001c70   Section        0  zongzhixin.o(i.ZhuJi_Init)
+    i.ZongXunHuan                            0x08001d98   Section        0  zongzhixin.o(i.ZongXunHuan)
+    i.crc16                                  0x08002548   Section        0  crc_funation.o(i.crc16)
+    i.main                                   0x08002584   Section        0  main.o(i.main)
     .ARM.__AT_0x08010000                     0x08010000   Section     6144  flish_funation.o(.ARM.__AT_0x08010000)
     .data                                    0x20000000   Section       20  stm32f10x_rcc.o(.data)
     APBAHBPrescTable                         0x20000000   Data          16  stm32f10x_rcc.o(.data)
     ADCPrescTable                            0x20000010   Data           4  stm32f10x_rcc.o(.data)
     .data                                    0x20000014   Section        5  gpio_funation.o(.data)
     .data                                    0x2000001c   Section        5  tim_funation.o(.data)
-    .data                                    0x20000022   Section       24  usart_funation.o(.data)
-    .data                                    0x2000003c   Section       26  flish_funation.o(.data)
-    .data                                    0x20000056   Section       31  zongzhixin.o(.data)
-    .bss                                     0x20000078   Section    13146  usart_funation.o(.bss)
-    .bss                                     0x200033d2   Section     6144  flish_funation.o(.bss)
-    .bss                                     0x20004bd2   Section     5494  zongzhixin.o(.bss)
-    .bss                                     0x20006148   Section       96  libspace.o(.bss)
-    HEAP                                     0x200061a8   Section      512  startup_stm32f10x_hd.o(HEAP)
-    Heap_Mem                                 0x200061a8   Data         512  startup_stm32f10x_hd.o(HEAP)
-    STACK                                    0x200063a8   Section     1024  startup_stm32f10x_hd.o(STACK)
-    Stack_Mem                                0x200063a8   Data        1024  startup_stm32f10x_hd.o(STACK)
-    __initial_sp                             0x200067a8   Data           0  startup_stm32f10x_hd.o(STACK)
+    .data                                    0x20000022   Section       14  usart_funation.o(.data)
+    .data                                    0x20000030   Section       26  flish_funation.o(.data)
+    .data                                    0x2000004a   Section       27  zongzhixin.o(.data)
+    .bss                                     0x20000068   Section    13130  usart_funation.o(.bss)
+    .bss                                     0x200033b2   Section     6144  flish_funation.o(.bss)
+    .bss                                     0x20004bb2   Section     5494  zongzhixin.o(.bss)
+    .bss                                     0x20006128   Section       96  libspace.o(.bss)
+    HEAP                                     0x20006188   Section      512  startup_stm32f10x_hd.o(HEAP)
+    Heap_Mem                                 0x20006188   Data         512  startup_stm32f10x_hd.o(HEAP)
+    STACK                                    0x20006388   Section     1536  startup_stm32f10x_hd.o(STACK)
+    Stack_Mem                                0x20006388   Data        1536  startup_stm32f10x_hd.o(STACK)
+    __initial_sp                             0x20006988   Data           0  startup_stm32f10x_hd.o(STACK)
 
     Global Symbols
 
@@ -877,102 +873,93 @@ Image Symbol Table
     NVIC_Init                                0x08000d2d   Thumb Code   100  misc.o(i.NVIC_Init)
     NVIC_Init_PeiZhi                         0x08000d9d   Thumb Code   124  nvic_funation.o(i.NVIC_Init_PeiZhi)
     NVIC_PriorityGroupConfig                 0x08000e19   Thumb Code    10  misc.o(i.NVIC_PriorityGroupConfig)
-    PendSV_Handler                           0x08000e2d   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
-    RCC_APB1PeriphClockCmd                   0x08000e31   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
-    RCC_APB1PeriphResetCmd                   0x08000e51   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd)
-    RCC_APB2PeriphClockCmd                   0x08000e71   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
-    RCC_APB2PeriphResetCmd                   0x08000e91   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphResetCmd)
-    RCC_GetClocksFreq                        0x08000eb1   Thumb Code   192  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
-    SVC_Handler                              0x08000f85   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
-    SysTick_Handler                          0x08001071   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
-    SystemInit                               0x08001075   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
-    TIM3_IRQHandler                          0x080010d5   Thumb Code    90  tim_funation.o(i.TIM3_IRQHandler)
-    TIM_ClearFlag                            0x08001145   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearFlag)
-    TIM_ClearITPendingBit                    0x0800114b   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearITPendingBit)
-    TIM_Cmd                                  0x08001151   Thumb Code    24  stm32f10x_tim.o(i.TIM_Cmd)
-    TIM_GetITStatus                          0x08001169   Thumb Code    34  stm32f10x_tim.o(i.TIM_GetITStatus)
-    TIM_ITConfig                             0x0800118b   Thumb Code    18  stm32f10x_tim.o(i.TIM_ITConfig)
-    TIM_TimeBaseInit                         0x0800119d   Thumb Code   122  stm32f10x_tim.o(i.TIM_TimeBaseInit)
-    Tim_Init_PeiZhi                          0x08001241   Thumb Code    74  tim_funation.o(i.Tim_Init_PeiZhi)
-    TonXunFaSong                             0x08001291   Thumb Code   134  usart_funation.o(i.TonXunFaSong)
-    USART1_IRQHandler                        0x08001321   Thumb Code   146  usart_funation.o(i.USART1_IRQHandler)
-    USART2_IRQHandler                        0x080013c9   Thumb Code   172  usart_funation.o(i.USART2_IRQHandler)
-    USART_ClearITPendingBit                  0x08001491   Thumb Code    30  stm32f10x_usart.o(i.USART_ClearITPendingBit)
-    USART_Cmd                                0x080014af   Thumb Code    24  stm32f10x_usart.o(i.USART_Cmd)
-    USART_DeInit                             0x080014c9   Thumb Code   134  stm32f10x_usart.o(i.USART_DeInit)
-    USART_GetITStatus                        0x08001565   Thumb Code    84  stm32f10x_usart.o(i.USART_GetITStatus)
-    USART_ITConfig                           0x080015b9   Thumb Code    74  stm32f10x_usart.o(i.USART_ITConfig)
-    USART_InIt_PeiZhi                        0x08001605   Thumb Code   246  usart_funation.o(i.USART_InIt_PeiZhi)
-    USART_Init                               0x0800170d   Thumb Code   210  stm32f10x_usart.o(i.USART_Init)
-    USART_ReceiveData                        0x080017e5   Thumb Code    10  stm32f10x_usart.o(i.USART_ReceiveData)
-    USART_SendData                           0x080017f1   Thumb Code    74  stm32f10x_usart.o(i.USART_SendData)
-    UsageFault_Handler                       0x0800184d   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
-    ZhuJi2_ShuJuChuLi                        0x08001851   Thumb Code   110  usart_funation.o(i.ZhuJi2_ShuJuChuLi)
-    ZhuJi2_ShuJuChuLi2                       0x080018cd   Thumb Code   454  usart_funation.o(i.ZhuJi2_ShuJuChuLi2)
-    ZhuJi_Init                               0x08001aad   Thumb Code   412  zongzhixin.o(i.ZhuJi_Init)
-    ZhuJi_ShuJuChuLi                         0x08001c6d   Thumb Code   110  usart_funation.o(i.ZhuJi_ShuJuChuLi)
-    ZhuJi_ShuJuChuLi2                        0x08001ce9   Thumb Code   464  usart_funation.o(i.ZhuJi_ShuJuChuLi2)
-    ZongXunHuan                              0x08001ed1   Thumb Code  1912  zongzhixin.o(i.ZongXunHuan)
-    crc16                                    0x08002681   Thumb Code    60  crc_funation.o(i.crc16)
-    main                                     0x080026bd   Thumb Code   116  main.o(i.main)
-    Region$$Table$$Base                      0x08002740   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08002760   Number         0  anon$$obj.o(Region$$Table)
+    PC_ProcessRecvData                       0x08000e2d   Thumb Code   464  usart_funation.o(i.PC_ProcessRecvData)
+    PC_RecvData                              0x08001015   Thumb Code    74  usart_funation.o(i.PC_RecvData)
+    PendSV_Handler                           0x08001069   Thumb Code     2  stm32f10x_it.o(i.PendSV_Handler)
+    RCC_APB1PeriphClockCmd                   0x0800106d   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB1PeriphClockCmd)
+    RCC_APB1PeriphResetCmd                   0x0800108d   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB1PeriphResetCmd)
+    RCC_APB2PeriphClockCmd                   0x080010ad   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphClockCmd)
+    RCC_APB2PeriphResetCmd                   0x080010cd   Thumb Code    26  stm32f10x_rcc.o(i.RCC_APB2PeriphResetCmd)
+    RCC_GetClocksFreq                        0x080010ed   Thumb Code   192  stm32f10x_rcc.o(i.RCC_GetClocksFreq)
+    SVC_Handler                              0x080011c1   Thumb Code     2  stm32f10x_it.o(i.SVC_Handler)
+    Slave_ProcessRecvData                    0x080012ad   Thumb Code   454  usart_funation.o(i.Slave_ProcessRecvData)
+    Slave_RecvData                           0x0800148d   Thumb Code    74  usart_funation.o(i.Slave_RecvData)
+    SysTick_Handler                          0x080014e1   Thumb Code     2  stm32f10x_it.o(i.SysTick_Handler)
+    SystemInit                               0x080014e5   Thumb Code    78  system_stm32f10x.o(i.SystemInit)
+    TIM3_IRQHandler                          0x08001545   Thumb Code    90  tim_funation.o(i.TIM3_IRQHandler)
+    TIM_ClearFlag                            0x080015b5   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearFlag)
+    TIM_ClearITPendingBit                    0x080015bb   Thumb Code     6  stm32f10x_tim.o(i.TIM_ClearITPendingBit)
+    TIM_Cmd                                  0x080015c1   Thumb Code    24  stm32f10x_tim.o(i.TIM_Cmd)
+    TIM_GetITStatus                          0x080015d9   Thumb Code    34  stm32f10x_tim.o(i.TIM_GetITStatus)
+    TIM_ITConfig                             0x080015fb   Thumb Code    18  stm32f10x_tim.o(i.TIM_ITConfig)
+    TIM_TimeBaseInit                         0x0800160d   Thumb Code   122  stm32f10x_tim.o(i.TIM_TimeBaseInit)
+    Tim_Init_PeiZhi                          0x080016b1   Thumb Code    74  tim_funation.o(i.Tim_Init_PeiZhi)
+    TonXunFaSong                             0x08001701   Thumb Code    96  usart_funation.o(i.TonXunFaSong)
+    USART1_IRQHandler                        0x08001765   Thumb Code   124  usart_funation.o(i.USART1_IRQHandler)
+    USART2_IRQHandler                        0x080017f1   Thumb Code   150  usart_funation.o(i.USART2_IRQHandler)
+    USART_ClearITPendingBit                  0x080018a1   Thumb Code    30  stm32f10x_usart.o(i.USART_ClearITPendingBit)
+    USART_Cmd                                0x080018bf   Thumb Code    24  stm32f10x_usart.o(i.USART_Cmd)
+    USART_DeInit                             0x080018d9   Thumb Code   134  stm32f10x_usart.o(i.USART_DeInit)
+    USART_GetITStatus                        0x08001975   Thumb Code    84  stm32f10x_usart.o(i.USART_GetITStatus)
+    USART_ITConfig                           0x080019c9   Thumb Code    74  stm32f10x_usart.o(i.USART_ITConfig)
+    USART_InIt_PeiZhi                        0x08001a15   Thumb Code   266  usart_funation.o(i.USART_InIt_PeiZhi)
+    USART_Init                               0x08001b2d   Thumb Code   210  stm32f10x_usart.o(i.USART_Init)
+    USART_ReceiveData                        0x08001c05   Thumb Code    10  stm32f10x_usart.o(i.USART_ReceiveData)
+    USART_SendData                           0x08001c11   Thumb Code    74  stm32f10x_usart.o(i.USART_SendData)
+    UsageFault_Handler                       0x08001c6d   Thumb Code     4  stm32f10x_it.o(i.UsageFault_Handler)
+    ZhuJi_Init                               0x08001c71   Thumb Code   264  zongzhixin.o(i.ZhuJi_Init)
+    ZongXunHuan                              0x08001d99   Thumb Code  1912  zongzhixin.o(i.ZongXunHuan)
+    crc16                                    0x08002549   Thumb Code    60  crc_funation.o(i.crc16)
+    main                                     0x08002585   Thumb Code   116  main.o(i.main)
+    Region$$Table$$Base                      0x08002608   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08002628   Number         0  anon$$obj.o(Region$$Table)
     ChengXu_Data                             0x08010000   Data        6144  flish_funation.o(.ARM.__AT_0x08010000)
     GPIO_InitStructure                       0x20000014   Data           4  gpio_funation.o(.data)
     GPIO_i                                   0x20000018   Data           1  gpio_funation.o(.data)
     time                                     0x2000001c   Data           4  tim_funation.o(.data)
     Time_500Ms_Flag                          0x20000020   Data           1  tim_funation.o(.data)
-    RxBuffer1                                0x20000022   Data           1  usart_funation.o(.data)
-    RxBuffer2                                0x20000023   Data           1  usart_funation.o(.data)
-    Rx_i                                     0x20000024   Data           1  usart_funation.o(.data)
-    ZhongDuan_TX_Flag                        0x20000025   Data           4  usart_funation.o(.data)
-    RX1_i                                    0x20000029   Data           1  usart_funation.o(.data)
-    RX2_i                                    0x2000002a   Data           1  usart_funation.o(.data)
-    ZhuJi_ShuJuChuLi_i                       0x2000002c   Data           2  usart_funation.o(.data)
-    ZhuJi2_ShuJuChuLi_i                      0x2000002e   Data           2  usart_funation.o(.data)
-    ZhuJi_ShuJuChuLi2_i                      0x20000030   Data           2  usart_funation.o(.data)
-    ZhuJi_ShuJuChuLi2_j                      0x20000032   Data           2  usart_funation.o(.data)
-    ZhuJi2_ShuJuChuLi2_i                     0x20000034   Data           2  usart_funation.o(.data)
-    ZhuJi2_ShuJuChuLi2_j                     0x20000036   Data           2  usart_funation.o(.data)
-    DianNaoFaSong_i                          0x20000038   Data           2  usart_funation.o(.data)
-    EraseCounter                             0x2000003c   Data           4  flish_funation.o(.data)
-    Address                                  0x20000040   Data           4  flish_funation.o(.data)
-    NbrOfPage                                0x20000044   Data           4  flish_funation.o(.data)
-    FLASHStatus                              0x20000048   Data           1  flish_funation.o(.data)
-    WRITE_START_ADDR2                        0x2000004c   Data           4  flish_funation.o(.data)
-    Flash_Write_Str_i                        0x20000050   Data           4  flish_funation.o(.data)
-    Flash_Write_Str_j                        0x20000054   Data           2  flish_funation.o(.data)
-    ZongXunHuan_i                            0x20000056   Data           2  zongzhixin.o(.data)
-    ZongXunHuan_j                            0x20000058   Data           2  zongzhixin.o(.data)
-    ZongXunHuan2_i                           0x2000005a   Data           2  zongzhixin.o(.data)
-    ZongXunHuan2_j                           0x2000005c   Data           2  zongzhixin.o(.data)
-    ZhuJi_Init_i                             0x2000005e   Data           2  zongzhixin.o(.data)
-    SheBeiShu                                0x20000060   Data           2  zongzhixin.o(.data)
-    AnWeiSouXun_Flag                         0x20000062   Data           2  zongzhixin.o(.data)
-    AnWeiSouXun_Time                         0x20000064   Data           2  zongzhixin.o(.data)
-    FenJi_Num                                0x20000066   Data           2  zongzhixin.o(.data)
-    FenJiHuiYin_Flag                         0x20000068   Data           2  zongzhixin.o(.data)
-    XuLieHao                                 0x2000006a   Data           5  zongzhixin.o(.data)
-    FenJi_XuLieHao_H1                        0x2000006f   Data           5  zongzhixin.o(.data)
-    FenJiHaoFuZhi_HuanCun                    0x20000074   Data           1  zongzhixin.o(.data)
-    USART_InitStructure                      0x20000078   Data          16  usart_funation.o(.bss)
-    DianNaoJieShou_HuanCun                   0x20000088   Data       10300  usart_funation.o(.bss)
-    DianNaoJieShou2_HuanCun                  0x200028c4   Data         750  usart_funation.o(.bss)
-    DianNaoJieShou_HuanCun_i                 0x20002bb2   Data          10  usart_funation.o(.bss)
-    DianNaoJieShou2_HuanCun_i                0x20002bbc   Data          10  usart_funation.o(.bss)
-    CRC_HuanCun                              0x20002bc6   Data        2060  usart_funation.o(.bss)
-    Flash_ChengXu_Data                       0x200033d2   Data        2048  flish_funation.o(.bss)
-    Flash_ChengXu_Data2                      0x20003bd2   Data        2048  flish_funation.o(.bss)
-    Flash_Write_Data2                        0x200043d2   Data        2048  flish_funation.o(.bss)
-    GongNeng_HuanCun                         0x20004bd2   Data        2060  zongzhixin.o(.bss)
-    FaSong_HuanCun                           0x200053de   Data        2060  zongzhixin.o(.bss)
-    GongNeng2_HuanCun                        0x20005bea   Data         150  zongzhixin.o(.bss)
-    FaSong2_HuanCun                          0x20005c80   Data         150  zongzhixin.o(.bss)
-    ZhiLin_ChangDu                           0x20005d16   Data         512  zongzhixin.o(.bss)
-    ZhiLin2_ChangDu                          0x20005f16   Data         512  zongzhixin.o(.bss)
-    FenJi_XuLieHao                           0x20006116   Data          50  zongzhixin.o(.bss)
-    __libspace_start                         0x20006148   Data          96  libspace.o(.bss)
-    __temporary_stack_top$libspace           0x200061a8   Data           0  libspace.o(.bss)
+    RxData1                                  0x20000022   Data           1  usart_funation.o(.data)
+    RxData2                                  0x20000023   Data           1  usart_funation.o(.data)
+    PC_ProcessRecvData_i                     0x20000024   Data           2  usart_funation.o(.data)
+    PC_ProcessRecvData_j                     0x20000026   Data           2  usart_funation.o(.data)
+    Slave_ProcessRecvData_i                  0x20000028   Data           2  usart_funation.o(.data)
+    Slave_ProcessRecvData_j                  0x2000002a   Data           2  usart_funation.o(.data)
+    ZhongDuan_TX_Flag                        0x2000002c   Data           4  usart_funation.o(.data)
+    EraseCounter                             0x20000030   Data           4  flish_funation.o(.data)
+    Address                                  0x20000034   Data           4  flish_funation.o(.data)
+    NbrOfPage                                0x20000038   Data           4  flish_funation.o(.data)
+    FLASHStatus                              0x2000003c   Data           1  flish_funation.o(.data)
+    WRITE_START_ADDR2                        0x20000040   Data           4  flish_funation.o(.data)
+    Flash_Write_Str_i                        0x20000044   Data           4  flish_funation.o(.data)
+    Flash_Write_Str_j                        0x20000048   Data           2  flish_funation.o(.data)
+    ZongXunHuan_i                            0x2000004a   Data           2  zongzhixin.o(.data)
+    ZongXunHuan_j                            0x2000004c   Data           2  zongzhixin.o(.data)
+    ZongXunHuan2_i                           0x2000004e   Data           2  zongzhixin.o(.data)
+    ZongXunHuan2_j                           0x20000050   Data           2  zongzhixin.o(.data)
+    AnWeiSouXun_Flag                         0x20000052   Data           2  zongzhixin.o(.data)
+    AnWeiSouXun_Time                         0x20000054   Data           2  zongzhixin.o(.data)
+    FenJi_Num                                0x20000056   Data           2  zongzhixin.o(.data)
+    FenJiHuiYin_Flag                         0x20000058   Data           2  zongzhixin.o(.data)
+    XuLieHao                                 0x2000005a   Data           5  zongzhixin.o(.data)
+    FenJi_XuLieHao_H1                        0x2000005f   Data           5  zongzhixin.o(.data)
+    FenJiHaoFuZhi_HuanCun                    0x20000064   Data           1  zongzhixin.o(.data)
+    PC_RxHuanCun                             0x20000068   Data       10300  usart_funation.o(.bss)
+    Slave_RxHuanCun                          0x200028a4   Data         750  usart_funation.o(.bss)
+    PC_RxHuanCun_i                           0x20002b92   Data          10  usart_funation.o(.bss)
+    Slave_RxHuanCun_i                        0x20002b9c   Data          10  usart_funation.o(.bss)
+    CRC_HuanCun                              0x20002ba6   Data        2060  usart_funation.o(.bss)
+    Flash_ChengXu_Data                       0x200033b2   Data        2048  flish_funation.o(.bss)
+    Flash_ChengXu_Data2                      0x20003bb2   Data        2048  flish_funation.o(.bss)
+    Flash_Write_Data2                        0x200043b2   Data        2048  flish_funation.o(.bss)
+    GongNeng_HuanCun                         0x20004bb2   Data        2060  zongzhixin.o(.bss)
+    GongNeng2_HuanCun                        0x200053be   Data         150  zongzhixin.o(.bss)
+    FaSong_HuanCun                           0x20005454   Data        2060  zongzhixin.o(.bss)
+    FaSong2_HuanCun                          0x20005c60   Data         150  zongzhixin.o(.bss)
+    ZhiLin_ChangDu                           0x20005cf6   Data         512  zongzhixin.o(.bss)
+    ZhiLin2_ChangDu                          0x20005ef6   Data         512  zongzhixin.o(.bss)
+    FenJi_XuLieHao                           0x200060f6   Data          50  zongzhixin.o(.bss)
+    __libspace_start                         0x20006128   Data          96  libspace.o(.bss)
+    __temporary_stack_top$libspace           0x20006188   Data           0  libspace.o(.bss)
 
 
 
@@ -982,7 +969,7 @@ Memory Map of the image
 
   Image Entry point : 0x08000131
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00011878, Max: 0x00040000, ABSOLUTE)
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00011868, Max: 0x00040000, ABSOLUTE)
 
     Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00011800, Max: 0x00040000, ABSOLUTE)
 
@@ -1071,58 +1058,58 @@ Memory Map of the image
     0x08000d2c   0x08000d2c   0x00000070   Code   RO         1618    i.NVIC_Init         misc.o
     0x08000d9c   0x08000d9c   0x0000007c   Code   RO         1682    i.NVIC_Init_PeiZhi  nvic_funation.o
     0x08000e18   0x08000e18   0x00000014   Code   RO         1619    i.NVIC_PriorityGroupConfig  misc.o
-    0x08000e2c   0x08000e2c   0x00000002   Code   RO          114    i.PendSV_Handler    stm32f10x_it.o
-    0x08000e2e   0x08000e2e   0x00000002   PAD
-    0x08000e30   0x08000e30   0x00000020   Code   RO          362    i.RCC_APB1PeriphClockCmd  stm32f10x_rcc.o
-    0x08000e50   0x08000e50   0x00000020   Code   RO          363    i.RCC_APB1PeriphResetCmd  stm32f10x_rcc.o
-    0x08000e70   0x08000e70   0x00000020   Code   RO          364    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
-    0x08000e90   0x08000e90   0x00000020   Code   RO          365    i.RCC_APB2PeriphResetCmd  stm32f10x_rcc.o
-    0x08000eb0   0x08000eb0   0x000000d4   Code   RO          372    i.RCC_GetClocksFreq  stm32f10x_rcc.o
-    0x08000f84   0x08000f84   0x00000002   Code   RO          115    i.SVC_Handler       stm32f10x_it.o
-    0x08000f86   0x08000f86   0x00000008   Code   RO          172    i.SetSysClock       system_stm32f10x.o
-    0x08000f8e   0x08000f8e   0x00000002   PAD
-    0x08000f90   0x08000f90   0x000000e0   Code   RO          173    i.SetSysClockTo72   system_stm32f10x.o
-    0x08001070   0x08001070   0x00000002   Code   RO          116    i.SysTick_Handler   stm32f10x_it.o
-    0x08001072   0x08001072   0x00000002   PAD
-    0x08001074   0x08001074   0x00000060   Code   RO          175    i.SystemInit        system_stm32f10x.o
-    0x080010d4   0x080010d4   0x00000070   Code   RO         1694    i.TIM3_IRQHandler   tim_funation.o
-    0x08001144   0x08001144   0x00000006   Code   RO          899    i.TIM_ClearFlag     stm32f10x_tim.o
-    0x0800114a   0x0800114a   0x00000006   Code   RO          900    i.TIM_ClearITPendingBit  stm32f10x_tim.o
-    0x08001150   0x08001150   0x00000018   Code   RO          905    i.TIM_Cmd           stm32f10x_tim.o
-    0x08001168   0x08001168   0x00000022   Code   RO          926    i.TIM_GetITStatus   stm32f10x_tim.o
-    0x0800118a   0x0800118a   0x00000012   Code   RO          930    i.TIM_ITConfig      stm32f10x_tim.o
-    0x0800119c   0x0800119c   0x000000a4   Code   RO          976    i.TIM_TimeBaseInit  stm32f10x_tim.o
-    0x08001240   0x08001240   0x00000050   Code   RO         1695    i.Tim_Init_PeiZhi   tim_funation.o
-    0x08001290   0x08001290   0x00000090   Code   RO         1718    i.TonXunFaSong      usart_funation.o
-    0x08001320   0x08001320   0x000000a8   Code   RO         1719    i.USART1_IRQHandler  usart_funation.o
-    0x080013c8   0x080013c8   0x000000c8   Code   RO         1720    i.USART2_IRQHandler  usart_funation.o
-    0x08001490   0x08001490   0x0000001e   Code   RO         1438    i.USART_ClearITPendingBit  stm32f10x_usart.o
-    0x080014ae   0x080014ae   0x00000018   Code   RO         1441    i.USART_Cmd         stm32f10x_usart.o
-    0x080014c6   0x080014c6   0x00000002   PAD
-    0x080014c8   0x080014c8   0x0000009c   Code   RO         1443    i.USART_DeInit      stm32f10x_usart.o
-    0x08001564   0x08001564   0x00000054   Code   RO         1445    i.USART_GetITStatus  stm32f10x_usart.o
-    0x080015b8   0x080015b8   0x0000004a   Code   RO         1447    i.USART_ITConfig    stm32f10x_usart.o
-    0x08001602   0x08001602   0x00000002   PAD
-    0x08001604   0x08001604   0x00000108   Code   RO         1721    i.USART_InIt_PeiZhi  usart_funation.o
-    0x0800170c   0x0800170c   0x000000d8   Code   RO         1448    i.USART_Init        stm32f10x_usart.o
-    0x080017e4   0x080017e4   0x0000000a   Code   RO         1455    i.USART_ReceiveData  stm32f10x_usart.o
-    0x080017ee   0x080017ee   0x00000002   PAD
-    0x080017f0   0x080017f0   0x0000005c   Code   RO         1458    i.USART_SendData    stm32f10x_usart.o
-    0x0800184c   0x0800184c   0x00000004   Code   RO          117    i.UsageFault_Handler  stm32f10x_it.o
-    0x08001850   0x08001850   0x0000007c   Code   RO         1722    i.ZhuJi2_ShuJuChuLi  usart_funation.o
-    0x080018cc   0x080018cc   0x000001e0   Code   RO         1723    i.ZhuJi2_ShuJuChuLi2  usart_funation.o
-    0x08001aac   0x08001aac   0x000001c0   Code   RO         1827    i.ZhuJi_Init        zongzhixin.o
-    0x08001c6c   0x08001c6c   0x0000007c   Code   RO         1724    i.ZhuJi_ShuJuChuLi  usart_funation.o
-    0x08001ce8   0x08001ce8   0x000001e8   Code   RO         1725    i.ZhuJi_ShuJuChuLi2  usart_funation.o
-    0x08001ed0   0x08001ed0   0x000007b0   Code   RO         1828    i.ZongXunHuan       zongzhixin.o
-    0x08002680   0x08002680   0x0000003c   Code   RO         1850    i.crc16             crc_funation.o
-    0x080026bc   0x080026bc   0x00000084   Code   RO           24    i.main              main.o
-    0x08002740   0x08002740   0x00000020   Data   RO         2023    Region$$Table       anon$$obj.o
-    0x08002760   0x08002760   0x0000d8a0   PAD
+    0x08000e2c   0x08000e2c   0x000001e8   Code   RO         1717    i.PC_ProcessRecvData  usart_funation.o
+    0x08001014   0x08001014   0x00000054   Code   RO         1718    i.PC_RecvData       usart_funation.o
+    0x08001068   0x08001068   0x00000002   Code   RO          114    i.PendSV_Handler    stm32f10x_it.o
+    0x0800106a   0x0800106a   0x00000002   PAD
+    0x0800106c   0x0800106c   0x00000020   Code   RO          362    i.RCC_APB1PeriphClockCmd  stm32f10x_rcc.o
+    0x0800108c   0x0800108c   0x00000020   Code   RO          363    i.RCC_APB1PeriphResetCmd  stm32f10x_rcc.o
+    0x080010ac   0x080010ac   0x00000020   Code   RO          364    i.RCC_APB2PeriphClockCmd  stm32f10x_rcc.o
+    0x080010cc   0x080010cc   0x00000020   Code   RO          365    i.RCC_APB2PeriphResetCmd  stm32f10x_rcc.o
+    0x080010ec   0x080010ec   0x000000d4   Code   RO          372    i.RCC_GetClocksFreq  stm32f10x_rcc.o
+    0x080011c0   0x080011c0   0x00000002   Code   RO          115    i.SVC_Handler       stm32f10x_it.o
+    0x080011c2   0x080011c2   0x00000008   Code   RO          172    i.SetSysClock       system_stm32f10x.o
+    0x080011ca   0x080011ca   0x00000002   PAD
+    0x080011cc   0x080011cc   0x000000e0   Code   RO          173    i.SetSysClockTo72   system_stm32f10x.o
+    0x080012ac   0x080012ac   0x000001e0   Code   RO         1719    i.Slave_ProcessRecvData  usart_funation.o
+    0x0800148c   0x0800148c   0x00000054   Code   RO         1720    i.Slave_RecvData    usart_funation.o
+    0x080014e0   0x080014e0   0x00000002   Code   RO          116    i.SysTick_Handler   stm32f10x_it.o
+    0x080014e2   0x080014e2   0x00000002   PAD
+    0x080014e4   0x080014e4   0x00000060   Code   RO          175    i.SystemInit        system_stm32f10x.o
+    0x08001544   0x08001544   0x00000070   Code   RO         1694    i.TIM3_IRQHandler   tim_funation.o
+    0x080015b4   0x080015b4   0x00000006   Code   RO          899    i.TIM_ClearFlag     stm32f10x_tim.o
+    0x080015ba   0x080015ba   0x00000006   Code   RO          900    i.TIM_ClearITPendingBit  stm32f10x_tim.o
+    0x080015c0   0x080015c0   0x00000018   Code   RO          905    i.TIM_Cmd           stm32f10x_tim.o
+    0x080015d8   0x080015d8   0x00000022   Code   RO          926    i.TIM_GetITStatus   stm32f10x_tim.o
+    0x080015fa   0x080015fa   0x00000012   Code   RO          930    i.TIM_ITConfig      stm32f10x_tim.o
+    0x0800160c   0x0800160c   0x000000a4   Code   RO          976    i.TIM_TimeBaseInit  stm32f10x_tim.o
+    0x080016b0   0x080016b0   0x00000050   Code   RO         1695    i.Tim_Init_PeiZhi   tim_funation.o
+    0x08001700   0x08001700   0x00000064   Code   RO         1722    i.TonXunFaSong      usart_funation.o
+    0x08001764   0x08001764   0x0000008c   Code   RO         1723    i.USART1_IRQHandler  usart_funation.o
+    0x080017f0   0x080017f0   0x000000b0   Code   RO         1724    i.USART2_IRQHandler  usart_funation.o
+    0x080018a0   0x080018a0   0x0000001e   Code   RO         1438    i.USART_ClearITPendingBit  stm32f10x_usart.o
+    0x080018be   0x080018be   0x00000018   Code   RO         1441    i.USART_Cmd         stm32f10x_usart.o
+    0x080018d6   0x080018d6   0x00000002   PAD
+    0x080018d8   0x080018d8   0x0000009c   Code   RO         1443    i.USART_DeInit      stm32f10x_usart.o
+    0x08001974   0x08001974   0x00000054   Code   RO         1445    i.USART_GetITStatus  stm32f10x_usart.o
+    0x080019c8   0x080019c8   0x0000004a   Code   RO         1447    i.USART_ITConfig    stm32f10x_usart.o
+    0x08001a12   0x08001a12   0x00000002   PAD
+    0x08001a14   0x08001a14   0x00000118   Code   RO         1725    i.USART_InIt_PeiZhi  usart_funation.o
+    0x08001b2c   0x08001b2c   0x000000d8   Code   RO         1448    i.USART_Init        stm32f10x_usart.o
+    0x08001c04   0x08001c04   0x0000000a   Code   RO         1455    i.USART_ReceiveData  stm32f10x_usart.o
+    0x08001c0e   0x08001c0e   0x00000002   PAD
+    0x08001c10   0x08001c10   0x0000005c   Code   RO         1458    i.USART_SendData    stm32f10x_usart.o
+    0x08001c6c   0x08001c6c   0x00000004   Code   RO          117    i.UsageFault_Handler  stm32f10x_it.o
+    0x08001c70   0x08001c70   0x00000128   Code   RO         1827    i.ZhuJi_Init        zongzhixin.o
+    0x08001d98   0x08001d98   0x000007b0   Code   RO         1828    i.ZongXunHuan       zongzhixin.o
+    0x08002548   0x08002548   0x0000003c   Code   RO         1850    i.crc16             crc_funation.o
+    0x08002584   0x08002584   0x00000084   Code   RO           24    i.main              main.o
+    0x08002608   0x08002608   0x00000020   Data   RO         2023    Region$$Table       anon$$obj.o
+    0x08002628   0x08002628   0x0000d9d8   PAD
     0x08010000   0x08010000   0x00001800   Data   RO         1791    .ARM.__AT_0x08010000  flish_funation.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08011800, Size: 0x000067a8, Max: 0x0000c000, ABSOLUTE)
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08011800, Size: 0x00006988, Max: 0x0000c000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1131,17 +1118,16 @@ Memory Map of the image
     0x20000019   0x08011819   0x00000003   PAD
     0x2000001c   0x0801181c   0x00000005   Data   RW         1696    .data               tim_funation.o
     0x20000021   0x08011821   0x00000001   PAD
-    0x20000022   0x08011822   0x00000018   Data   RW         1727    .data               usart_funation.o
-    0x2000003a   0x0801183a   0x00000002   PAD
-    0x2000003c   0x0801183c   0x0000001a   Data   RW         1794    .data               flish_funation.o
-    0x20000056   0x08011856   0x0000001f   Data   RW         1830    .data               zongzhixin.o
-    0x20000075   0x08011875   0x00000003   PAD
-    0x20000078        -       0x0000335a   Zero   RW         1726    .bss                usart_funation.o
-    0x200033d2        -       0x00001800   Zero   RW         1792    .bss                flish_funation.o
-    0x20004bd2        -       0x00001576   Zero   RW         1829    .bss                zongzhixin.o
-    0x20006148        -       0x00000060   Zero   RW         1895    .bss                c_w.l(libspace.o)
-    0x200061a8        -       0x00000200   Zero   RW            2    HEAP                startup_stm32f10x_hd.o
-    0x200063a8        -       0x00000400   Zero   RW            1    STACK               startup_stm32f10x_hd.o
+    0x20000022   0x08011822   0x0000000e   Data   RW         1727    .data               usart_funation.o
+    0x20000030   0x08011830   0x0000001a   Data   RW         1794    .data               flish_funation.o
+    0x2000004a   0x0801184a   0x0000001b   Data   RW         1830    .data               zongzhixin.o
+    0x20000065   0x08011865   0x00000003   PAD
+    0x20000068        -       0x0000334a   Zero   RW         1726    .bss                usart_funation.o
+    0x200033b2        -       0x00001800   Zero   RW         1792    .bss                flish_funation.o
+    0x20004bb2        -       0x00001576   Zero   RW         1829    .bss                zongzhixin.o
+    0x20006128        -       0x00000060   Zero   RW         1895    .bss                c_w.l(libspace.o)
+    0x20006188        -       0x00000200   Zero   RW            2    HEAP                startup_stm32f10x_hd.o
+    0x20006388        -       0x00000600   Zero   RW            1    STACK               startup_stm32f10x_hd.o
 
 
 ==============================================================================
@@ -1158,7 +1144,7 @@ Image component sizes
        132         16          0          0          0      50415   main.o
        132         22          0          0          0       1543   misc.o
        124          0          0          0          0        575   nvic_funation.o
-        64         26        304          0       1536        844   startup_stm32f10x_hd.o
+        64         26        304          0       2048        844   startup_stm32f10x_hd.o
        286         36          0          0          0       3960   stm32f10x_flash.o
        450          6          0          0          0     208878   stm32f10x_gpio.o
         26          0          0          0          0       3790   stm32f10x_it.o
@@ -1167,13 +1153,13 @@ Image component sizes
        686         46          0          0          0       6964   stm32f10x_usart.o
        328         28          0          0          0       1833   system_stm32f10x.o
        192         28          0          5          0       1355   tim_funation.o
-      1992        156          0         24      13146       7218   usart_funation.o
-      2416        150          0         31       5494       3962   zongzhixin.o
+      1832        130          0         14      13130       6931   usart_funation.o
+      2264        146          0         27       5494       3887   zongzhixin.o
 
     ----------------------------------------------------------------------
-      9466        682      61936        120      26320     530821   Object Totals
+      9154        652      62248        104      26816     530459   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-        18          0      55456          9          0          0   (incl. Padding)
+        18          0      55768          7          0          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1220,15 +1206,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      9744        698      61936        120      26416     528229   Grand Totals
-      9744        698      61936        120      26416     528229   ELF Image Totals
-      9744        698      61936        120          0          0   ROM Totals
+      9432        668      62248        104      26912     527867   Grand Totals
+      9432        668      62248        104      26912     527867   ELF Image Totals
+      9432        668      62248        104          0          0   ROM Totals
 
 ==============================================================================
 
     Total RO  Size (Code + RO Data)                71680 (  70.00kB)
-    Total RW  Size (RW Data + ZI Data)             26536 (  25.91kB)
-    Total ROM Size (Code + RO Data + RW Data)      71800 (  70.12kB)
+    Total RW  Size (RW Data + ZI Data)             27016 (  26.38kB)
+    Total ROM Size (Code + RO Data + RW Data)      71784 (  70.10kB)
 
 ==============================================================================
 

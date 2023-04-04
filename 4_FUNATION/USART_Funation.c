@@ -2,32 +2,37 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-extern GPIO_InitTypeDef GPIO_InitStructure;
-extern u8 CRC_L,CRC_H;
-extern u8 GongNeng_HuanCun[2060],GongNeng2_HuanCun[150];
-extern u16 ZhiLin_ChangDu[256],ZhiLin2_ChangDu[256];
-USART_InitTypeDef USART_InitStructure;
-uchar RxBuffer1,RxBuffer2,Rx_i,ZhongDuan_TX_Flag[4]={0,0,0,0};
-u8 DianNaoJieShou_HuanCun[5][2060],RX1_i,DianNaoJieShou2_HuanCun[5][150],RX2_i;
-u16 ZhuJi_ShuJuChuLi_i=0,DianNaoJieShou_HuanCun_i[5]={0,0,0,0,0},ZhuJi2_ShuJuChuLi_i=0,DianNaoJieShou2_HuanCun_i[5]={0,0,0,0,0};
-u8 CRC_HuanCun[2060];
-u16 ZhuJi_ShuJuChuLi2_i=0,ZhuJi_ShuJuChuLi2_j=0,ZhuJi2_ShuJuChuLi2_i=0,ZhuJi2_ShuJuChuLi2_j=0;
-u16 DianNaoFaSong_i;
 extern u16 AnWeiSouXun_Flag;
 extern u16 AnWeiSouXun_Time;
 extern u8 FenJi_XuLieHao_H1[5];
+extern u8 GongNeng_HuanCun[2060], GongNeng2_HuanCun[150];
+extern u16 ZhiLin_ChangDu[256], ZhiLin2_ChangDu[256];
 
+u8  RxData1, RxData2;                                       //缓存一字节串口数据
+u8  PC_RxHuanCun[5][2060], Slave_RxHuanCun[5][150];         //电脑和从机的数据缓存   
+u16 PC_RxHuanCun_i[5], Slave_RxHuanCun_i[5];                //电脑和从机的数据缓存指针
+u8  CRC_HuanCun[2060];                                      //CRC校验数据缓存
+u16 PC_ProcessRecvData_i = 0, PC_ProcessRecvData_j = 0;     
+u16 Slave_ProcessRecvData_i = 0,Slave_ProcessRecvData_j = 0;
+u8  ZhongDuan_TX_Flag[4];
+
+
+//***************************************************************************
+//*begin:   串口初始化
+//***************************************************************************
+#if 1
 void USART_InIt_PeiZhi(void)
 {		
 	u8 USART_InIt_i,USART_InIt_j;
+    USART_InitTypeDef USART_InitStructure;
+    
 	for(USART_InIt_i=0;USART_InIt_i<5;USART_InIt_i++)
 	{
 		for(USART_InIt_j=0;USART_InIt_j<20;USART_InIt_j++)
 		{
-			DianNaoJieShou_HuanCun[USART_InIt_i][USART_InIt_j]=0;
+			PC_RxHuanCun[USART_InIt_i][USART_InIt_j]=0;
 		}
 	}
-	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_AFIO|RCC_APB2Periph_USART1 ,ENABLE);	//使能usart1时钟			
 	RCC_APB2PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);																					//使能usart2时钟	
 	
@@ -61,30 +66,39 @@ void USART_InIt_PeiZhi(void)
 	USART_Cmd(USART2, ENABLE);																								//使能USART2外设
 	USART_ClearITPendingBit(USART2, USART_IT_RXNE);                           //清除中断标志位
 	USART_ClearITPendingBit(USART2, USART_IT_TC);                           	//清除中断标志位
-	
 }
-   
-void USART1_IRQHandler(void)
+//***************************************************************************
+//*begin:   串口初始化
+//***************************************************************************
+#endif
+
+//***************************************************************************
+//*begin:   主机-PC串口1通信
+//***************************************************************************
+#if 1
+/******************** 串口1中断 *********************/
+void USART1_IRQHandler(void)    //host connect to PC
 {
+    u8 RX1_i;
     //判断现在的中断类型
     if(USART_GetITStatus(USART1,USART_IT_RXNE)== SET)
     {
-			if(RxBuffer1==0xa5)
+			if(RxData1==0xa5)
 			{
 				if(USART_ReceiveData(USART1)==0x01)
 				{
 					for(RX1_i=0;RX1_i<5;RX1_i++)
 					{
-						if(DianNaoJieShou_HuanCun_i[RX1_i]==0)
+						if(PC_RxHuanCun_i[RX1_i]==0)
 						{
-							DianNaoJieShou_HuanCun_i[RX1_i]=2;
+							PC_RxHuanCun_i[RX1_i]=2;
 							break;
 						}
 					}
 				}
 			}
-      RxBuffer1=USART_ReceiveData(USART1);												//读接收寄存器，系统自动清除接收中断标志位
-			ZhuJi_ShuJuChuLi(RxBuffer1);
+      RxData1=USART_ReceiveData(USART1);												//读接收寄存器，系统自动清除接收中断标志位
+			PC_RecvData(RxData1);
 			USART_ClearITPendingBit(USART1, USART_IT_RXNE);             //清除中断标志位
     }
     if(USART_GetITStatus(USART1,USART_IT_TC)== SET)
@@ -93,33 +107,95 @@ void USART1_IRQHandler(void)
 			USART_ClearITPendingBit(USART1, USART_IT_TC);              	//清除中断标志位
     }
 }
-void USART2_IRQHandler(void)
+/******************** 串口1接收PC数据 *********************/
+void PC_RecvData(u8 ZhuJi_Data)
 {
+    u16 PC_RecvData_i;
+	for(PC_RecvData_i=0;PC_RecvData_i<5;PC_RecvData_i++)//轮寻5个缓存数组
+	{
+		if(PC_RxHuanCun_i[PC_RecvData_i]>0)//如果数组中没有被填入则填入数据
+		{
+			if(PC_RxHuanCun_i[PC_RecvData_i]>2)
+				PC_RxHuanCun[PC_RecvData_i][PC_RxHuanCun_i[PC_RecvData_i]-3]=ZhuJi_Data;
+			PC_RxHuanCun_i[PC_RecvData_i]++;
+		}
+	}
+}
+/******************** 串口1处理PC数据 *********************/
+void PC_ProcessRecvData(void)
+{
+    u16 CRC_wcrc;
+	for(PC_ProcessRecvData_i=0;PC_ProcessRecvData_i<5;PC_ProcessRecvData_i++)//轮询5个缓存通道
+	{
+		if(ZhiLin_ChangDu[PC_RxHuanCun[PC_ProcessRecvData_i][0]-1]>4)//收到的数据长度达到指令长度
+		{
+			if(PC_RxHuanCun_i[PC_ProcessRecvData_i]>ZhiLin_ChangDu[PC_RxHuanCun[PC_ProcessRecvData_i][0]-1])
+			{
+				CRC_wcrc = crc16(PC_RxHuanCun[PC_ProcessRecvData_i],ZhiLin_ChangDu[PC_RxHuanCun[PC_ProcessRecvData_i][0]-1]-4);
+				if(PC_RxHuanCun[PC_ProcessRecvData_i][ZhiLin_ChangDu[PC_RxHuanCun[PC_ProcessRecvData_i][0]-1]-4]== (CRC_wcrc >> 8))
+				{
+					if(PC_RxHuanCun[PC_ProcessRecvData_i][ZhiLin_ChangDu[PC_RxHuanCun[PC_ProcessRecvData_i][0]-1]-3]== (CRC_wcrc & 0x00FF))
+					{
+						for(PC_ProcessRecvData_j=0;PC_ProcessRecvData_j<2060;PC_ProcessRecvData_j++)
+						{
+							GongNeng_HuanCun[PC_ProcessRecvData_j]=PC_RxHuanCun[PC_ProcessRecvData_i][PC_ProcessRecvData_j];  
+						}
+					}
+				}
+				PC_RxHuanCun_i[PC_ProcessRecvData_i]=0;
+				for(PC_ProcessRecvData_j=0;PC_ProcessRecvData_j<2060;PC_ProcessRecvData_j++)
+				{
+					PC_RxHuanCun[PC_ProcessRecvData_i][PC_ProcessRecvData_j]=0;
+				}
+			}
+		}else{
+			PC_RxHuanCun_i[PC_ProcessRecvData_i]=0;
+			for(PC_ProcessRecvData_j=0;PC_ProcessRecvData_j<2060;PC_ProcessRecvData_j++)
+			{
+				PC_RxHuanCun[PC_ProcessRecvData_i][PC_ProcessRecvData_j]=0;
+			}
+		}
+	}
+}
+//***************************************************************************
+//*end:     主机-PC串口1通信
+//***************************************************************************
+#endif
+
+//***************************************************************************
+//*begin:   主机-从机串口2通信
+//***************************************************************************
+#if 1
+/******************** 串口2中断 *********************/
+void USART2_IRQHandler(void)    //host connect to slave
+{
+    u8 RX_i;
     //判断现在的中断类型
     if(USART_GetITStatus(USART2,USART_IT_RXNE)== SET)
     {
-			if(AnWeiSouXun_Flag>0)//大于0时等待10ms未收到数据后启动下一次发送，如果收到返回数据则重新计时
-			{
-				AnWeiSouXun_Time=1;//收到返回数据则重新计时
-				if(AnWeiSouXun_Flag>10000)//大于10000为等待分机返回模式，这里也表示还未收到过返回数据
-				{
-					AnWeiSouXun_Flag-=10000;//收到返回数据标志
-				}
-			}
-			if(RxBuffer2==0xa5)
-			{
-				for(RX2_i=0;RX2_i<5;RX2_i++)
-				{
-					if(DianNaoJieShou2_HuanCun_i[RX2_i]==0)
-					{
-						DianNaoJieShou2_HuanCun_i[RX2_i]=3;
-						break;
-					}
-				}
-			}
-      RxBuffer2=USART_ReceiveData(USART2);												//读接收寄存器
-			ZhuJi2_ShuJuChuLi(RxBuffer2); 
-			USART_ClearITPendingBit(USART2, USART_IT_RXNE);             //清除中断标志位
+        /*  */
+        if(AnWeiSouXun_Flag>0)//大于0时等待10ms未收到数据后启动下一次发送，如果收到返回数据则重新计时
+        {
+            AnWeiSouXun_Time=1;//收到返回数据则重新计时
+            if(AnWeiSouXun_Flag>10000)//大于10000为等待分机返回模式，这里也表示还未收到过返回数据
+            {
+                AnWeiSouXun_Flag-=10000;//收到返回数据标志
+            }
+        }
+        if(RxData2==0xa5)
+        {
+            for(RX_i=0;RX_i<5;RX_i++)
+            {
+                if(Slave_RxHuanCun_i[RX_i]==0)
+                {
+                    Slave_RxHuanCun_i[RX_i]=3;
+                    break;
+                }
+            }
+        }
+        RxData2=USART_ReceiveData(USART2);												//读接收寄存器
+        Slave_RecvData(RxData2); 
+        USART_ClearITPendingBit(USART2, USART_IT_RXNE);             //清除中断标志位
     }
     if(USART_GetITStatus(USART2,USART_IT_TC)== SET)
     {
@@ -127,6 +203,67 @@ void USART2_IRQHandler(void)
 			USART_ClearITPendingBit(USART2, USART_IT_TC);              	//清除中断标志位
     }
 } 
+/******************** 串口2接收从机数据 *********************/
+void Slave_RecvData(u8 ZhuJi2_Data)  //ZhuJi2_Data   --->    Slave_RxHuanCun
+{
+    u16 Slave_RecvData_i;
+	for(Slave_RecvData_i=0;Slave_RecvData_i<5;Slave_RecvData_i++)
+	{
+		if(Slave_RxHuanCun_i[Slave_RecvData_i]>0)
+		{
+			if(Slave_RxHuanCun_i[Slave_RecvData_i]>2)
+			{
+				Slave_RxHuanCun[Slave_RecvData_i][Slave_RxHuanCun_i[Slave_RecvData_i]-3]=ZhuJi2_Data;
+			}
+			Slave_RxHuanCun_i[Slave_RecvData_i]++;
+		}
+	}
+}
+/******************** 串口2处理从机数据 *********************/
+void Slave_ProcessRecvData(void)  //Slave_RxHuanCun    --->    GongNeng2_HuanCun
+{
+    u16 CRC_wcrc;
+	for(Slave_ProcessRecvData_i=0;Slave_ProcessRecvData_i<5;Slave_ProcessRecvData_i++)
+	{  
+		if(ZhiLin2_ChangDu[Slave_RxHuanCun[Slave_ProcessRecvData_i][0]-1]>4)
+		{
+			if(Slave_RxHuanCun_i[Slave_ProcessRecvData_i]>ZhiLin2_ChangDu[Slave_RxHuanCun[Slave_ProcessRecvData_i][0]-1])
+			{
+				CRC_wcrc = crc16(Slave_RxHuanCun[Slave_ProcessRecvData_i],ZhiLin2_ChangDu[Slave_RxHuanCun[Slave_ProcessRecvData_i][0]-1]-3);
+				if(Slave_RxHuanCun[Slave_ProcessRecvData_i][ZhiLin2_ChangDu[Slave_RxHuanCun[Slave_ProcessRecvData_i][0]-1]-3]== (CRC_wcrc >> 8))
+				{
+					if(Slave_RxHuanCun[Slave_ProcessRecvData_i][ZhiLin2_ChangDu[Slave_RxHuanCun[Slave_ProcessRecvData_i][0]-1]-2]== (CRC_wcrc & 0x00FF))
+					{
+						for(Slave_ProcessRecvData_j=0;Slave_ProcessRecvData_j<150;Slave_ProcessRecvData_j++)
+						{
+							GongNeng2_HuanCun[Slave_ProcessRecvData_j]=Slave_RxHuanCun[Slave_ProcessRecvData_i][Slave_ProcessRecvData_j];  
+						}
+					}
+				}
+				Slave_RxHuanCun_i[Slave_ProcessRecvData_i]=0;
+				for(Slave_ProcessRecvData_j=0;Slave_ProcessRecvData_j<150;Slave_ProcessRecvData_j++)
+				{
+					Slave_RxHuanCun[Slave_ProcessRecvData_i][Slave_ProcessRecvData_j]=0;
+				}
+			}
+		}else{
+			Slave_RxHuanCun_i[Slave_ProcessRecvData_i]=0;
+			for(Slave_ProcessRecvData_j=0;Slave_ProcessRecvData_j<150;Slave_ProcessRecvData_j++)
+			{
+				Slave_RxHuanCun[Slave_ProcessRecvData_i][Slave_ProcessRecvData_j]=0;
+			}
+		}
+	}
+}
+//***************************************************************************
+//*end:     主机-从机串口2通信
+//***************************************************************************
+#endif
+
+//***************************************************************************
+//*begin:   串口发送功能函数
+//***************************************************************************
+#if 1
 
 void Str_Data(USART_TypeDef* USARTx,char *StrData)
 {
@@ -178,9 +315,11 @@ void Num_Data(USART_TypeDef* USARTx,long num)
   	n--;
   }
 }
+
 void TonXunFaSong(USART_TypeDef* USARTx,u8 DianNaoFaSong_HuanCun[],u16 DianNaoFaSong_START_ADDR,u8 DianNaoFaSong_Len)    
 {
     u16 CRC_wcrc;
+    u16 DianNaoFaSong_i;
 	for(DianNaoFaSong_i=0;DianNaoFaSong_i<DianNaoFaSong_Len;DianNaoFaSong_i++)
 	{
 		CRC_HuanCun[DianNaoFaSong_i]=DianNaoFaSong_HuanCun[DianNaoFaSong_START_ADDR+DianNaoFaSong_i];
@@ -194,104 +333,16 @@ void TonXunFaSong(USART_TypeDef* USARTx,u8 DianNaoFaSong_HuanCun[],u16 DianNaoFa
 	USART_SendData(USARTx,CRC_wcrc >> 8);
 	USART_SendData(USARTx,CRC_wcrc & 0x00FF);
 }
-void ZhuJi_ShuJuChuLi(u8 ZhuJi_Data)
-{
-	for(ZhuJi_ShuJuChuLi_i=0;ZhuJi_ShuJuChuLi_i<5;ZhuJi_ShuJuChuLi_i++)//轮寻5个缓存数组
-	{
-		if(DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi_i]>0)//如果数组中没有被填入则填入数据
-		{
-			if(DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi_i]>2)
-				DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi_i][DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi_i]-3]=ZhuJi_Data;
-			DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi_i]++;
-		}
-	}
-}
-void ZhuJi_ShuJuChuLi2(void)
-{
-    u16 CRC_wcrc;
-	for(ZhuJi_ShuJuChuLi2_i=0;ZhuJi_ShuJuChuLi2_i<5;ZhuJi_ShuJuChuLi2_i++)//轮询5个缓存通道
-	{
-		if(ZhiLin_ChangDu[DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][0]-1]>4)//收到的数据长度达到指令长度
-		{
-			if(DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi2_i]>ZhiLin_ChangDu[DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][0]-1])
-			{
-				CRC_wcrc = crc16(DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i],ZhiLin_ChangDu[DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][0]-1]-4);
-				if(DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][ZhiLin_ChangDu[DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][0]-1]-4]== (CRC_wcrc >> 8))
-				{
-					if(DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][ZhiLin_ChangDu[DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][0]-1]-3]== (CRC_wcrc & 0x00FF))
-					{
-						for(ZhuJi_ShuJuChuLi2_j=0;ZhuJi_ShuJuChuLi2_j<2060;ZhuJi_ShuJuChuLi2_j++)
-						{
-							GongNeng_HuanCun[ZhuJi_ShuJuChuLi2_j]=DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][ZhuJi_ShuJuChuLi2_j];  
-						}
-					}
-				}
-				DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi2_i]=0;
-				for(ZhuJi_ShuJuChuLi2_j=0;ZhuJi_ShuJuChuLi2_j<2060;ZhuJi_ShuJuChuLi2_j++)
-				{
-					DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][ZhuJi_ShuJuChuLi2_j]=0;
-				}
-			}
-		}else{
-			DianNaoJieShou_HuanCun_i[ZhuJi_ShuJuChuLi2_i]=0;
-			for(ZhuJi_ShuJuChuLi2_j=0;ZhuJi_ShuJuChuLi2_j<2060;ZhuJi_ShuJuChuLi2_j++)
-			{
-				DianNaoJieShou_HuanCun[ZhuJi_ShuJuChuLi2_i][ZhuJi_ShuJuChuLi2_j]=0;
-			}
-		}
-	}
-}
+//***************************************************************************
+//*end:     串口发送功能函数
+//***************************************************************************
+#endif
 
-void ZhuJi2_ShuJuChuLi(u8 ZhuJi2_Data)
-{
-	for(ZhuJi2_ShuJuChuLi_i=0;ZhuJi2_ShuJuChuLi_i<5;ZhuJi2_ShuJuChuLi_i++)
-	{
-		if(DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi_i]>0)
-		{
-			if(DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi_i]>2)
-			{
-				DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi_i][DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi_i]-3]=ZhuJi2_Data;
-			}
-			DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi_i]++;
-		}
-	}
-}
 
-void ZhuJi2_ShuJuChuLi2(void)
-{
-    u16 CRC_wcrc;
-	for(ZhuJi2_ShuJuChuLi2_i=0;ZhuJi2_ShuJuChuLi2_i<5;ZhuJi2_ShuJuChuLi2_i++)
-	{  
-		if(ZhiLin2_ChangDu[DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][0]-1]>4)
-		{
-			if(DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi2_i]>ZhiLin2_ChangDu[DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][0]-1])
-			{
-				CRC_wcrc = crc16(DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i],ZhiLin2_ChangDu[DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][0]-1]-3);
-				if(DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][ZhiLin2_ChangDu[DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][0]-1]-3]== (CRC_wcrc >> 8))
-				{
-					if(DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][ZhiLin2_ChangDu[DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][0]-1]-2]== (CRC_wcrc & 0x00FF))
-					{
-						for(ZhuJi2_ShuJuChuLi2_j=0;ZhuJi2_ShuJuChuLi2_j<150;ZhuJi2_ShuJuChuLi2_j++)
-						{
-							GongNeng2_HuanCun[ZhuJi2_ShuJuChuLi2_j]=DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][ZhuJi2_ShuJuChuLi2_j];  
-						}
-					}
-				}
-				DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi2_i]=0;
-				for(ZhuJi2_ShuJuChuLi2_j=0;ZhuJi2_ShuJuChuLi2_j<150;ZhuJi2_ShuJuChuLi2_j++)
-				{
-					DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][ZhuJi2_ShuJuChuLi2_j]=0;
-				}
-			}
-		}else{
-			DianNaoJieShou2_HuanCun_i[ZhuJi2_ShuJuChuLi2_i]=0;
-			for(ZhuJi2_ShuJuChuLi2_j=0;ZhuJi2_ShuJuChuLi2_j<150;ZhuJi2_ShuJuChuLi2_j++)
-			{
-				DianNaoJieShou2_HuanCun[ZhuJi2_ShuJuChuLi2_i][ZhuJi2_ShuJuChuLi2_j]=0;
-			}
-		}
-	}
-}
+
+
+
+
 
 
 

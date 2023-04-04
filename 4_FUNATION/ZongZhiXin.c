@@ -1,16 +1,16 @@
 #include "stm32f10x.h"
 #include <stdio.h>
 #include <stdarg.h>
-u8 GongNeng_HuanCun[2060],FaSong_HuanCun[2060],GongNeng2_HuanCun[150],FaSong2_HuanCun[150];
+u8 GongNeng_HuanCun[2060],GongNeng2_HuanCun[150];       //[0]:功能号，[1 ~ x]:数据
+u8 FaSong_HuanCun[2060],FaSong2_HuanCun[150];           //
 u16 ZhiLin_ChangDu[256],ZongXunHuan_i=0,ZongXunHuan_j=0,ZhiLin2_ChangDu[256],ZongXunHuan2_i=0,ZongXunHuan2_j=0;
-u16 ZhuJi_Init_i=0;
-u16 SheBeiShu=5;
 u16 AnWeiSouXun_Flag=0,AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
 u8 XuLieHao[5]={0x01,0x02,0x03,0x04,0x05};
 u8 FenJi_XuLieHao_H1[5]={0x00,0x00,0x00,0x00,0x00},FenJi_XuLieHao[10][5],FenJiHaoFuZhi_HuanCun=0;
 extern uint8_t ChengXu_Data[2048],Flash_ChengXu_Data[2048],Flash_ChengXu_Data2[2048];
 void ZhuJi_Init(void)
 {
+    u16 ZhuJi_Init_i=0;
 	for(ZhuJi_Init_i=0;ZhuJi_Init_i<2048;ZhuJi_Init_i++)
 	{
 		Flash_ChengXu_Data[ZhuJi_Init_i]=0;
@@ -67,7 +67,8 @@ void ZhuJi_Init(void)
 }
 void ZongXunHuan(void)
 {
-	if(AnWeiSouXun_Flag>0)//分机序列号检测模式
+    /* 分机序列号检测模式 */
+	if(AnWeiSouXun_Flag>0)
 	{
 		if(((AnWeiSouXun_Time>10)&&(AnWeiSouXun_Flag!=41))||((AnWeiSouXun_Time>20)&&(AnWeiSouXun_Flag==41)))//10ms未收到数据进入下一次发送模式,赋值编号是需要大于20ms
 		{
@@ -186,7 +187,7 @@ void ZongXunHuan(void)
 				FaSong_HuanCun[6]=ChengXu_Data[0x404+ZongXunHuan_i*5];
 				TonXunFaSong(USART1,FaSong_HuanCun,0,7); 
 			}
-		break;
+            break;
 		case 2://按位搜寻模块序列号 a5 01 02 81 3e
 			AnWeiSouXun_Flag=0;//重置发送标志位
 			FenJi_XuLieHao_H1[0]=0;
@@ -206,7 +207,7 @@ void ZongXunHuan(void)
 			AnWeiSouXun_Flag=10001;//大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
 			AnWeiSouXun_Time=1;//时钟开始计时，10ms未收到数据后启动下一次发送
 			TonXunFaSong(USART2,FaSong_HuanCun,0,8);//对分机发送数据
-		break;
+            break;
 		case 3://设备控制
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=3;
@@ -218,21 +219,21 @@ void ZongXunHuan(void)
 			FaSong_HuanCun[0]=GongNeng_HuanCun[1]*256+GongNeng_HuanCun[2];
 			FaSong_HuanCun[1]=1;
 			TonXunFaSong(USART2,FaSong_HuanCun,0,2);
-		break;
+            break;
 		case 4://触发控制
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=4;
 			FaSong_HuanCun[2]=GongNeng_HuanCun[1];
 			FaSong_HuanCun[3]=GongNeng_HuanCun[2];
 			TonXunFaSong(USART1,FaSong_HuanCun,0,4); 
-		break;
+            break;
 		case 5://联动效果执行
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=5;
 			FaSong_HuanCun[2]=GongNeng_HuanCun[1];
 			FaSong_HuanCun[3]=GongNeng_HuanCun[2];
 			TonXunFaSong(USART1,FaSong_HuanCun,0,4); 
-		break;
+            break;
 		case 6://音效控制
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=6;
@@ -241,7 +242,7 @@ void ZongXunHuan(void)
 			FaSong_HuanCun[4]=GongNeng_HuanCun[3];
 			FaSong_HuanCun[5]=GongNeng_HuanCun[4];
 			TonXunFaSong(USART1,FaSong_HuanCun,0,4); 
-		break;
+            break;
 		case 7://程序接收
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=7;
@@ -254,7 +255,7 @@ void ZongXunHuan(void)
 			}
 			Flash_Write_2K(0x08000000+GongNeng_HuanCun[1]*65536+GongNeng_HuanCun[2]*256+GongNeng_HuanCun[3]);
 			TonXunFaSong(USART1,FaSong_HuanCun,0,5); 
-		break;
+            break;
 		case 8://清除模块序列号
 			FaSong_HuanCun[0]=0xff;
 			FaSong_HuanCun[1]=0xff;
@@ -262,16 +263,16 @@ void ZongXunHuan(void)
 			TonXunFaSong(USART2,FaSong_HuanCun,0,3);
 			FaSong_HuanCun[0]=0x07;
 			TonXunFaSong(USART1,FaSong_HuanCun,0,1);
-		break;
+            break;
 		case 0xf0:
 			for(ZongXunHuan_i=0;ZongXunHuan_i<4096;ZongXunHuan_i++)
 			{
 				USART_SendData(USART1,ChengXu_Data[ZongXunHuan_i]);
 			}
-		break;
+            break;
 		case 100:
 			Flash_Write_Str(0x080107fd,GongNeng_HuanCun,0,7); 
-		break;
+            break;
 		case 255://主机序列号查询
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=0xff;
@@ -281,7 +282,7 @@ void ZongXunHuan(void)
 			FaSong_HuanCun[5]=XuLieHao[3];
 			FaSong_HuanCun[6]=XuLieHao[4];
 			TonXunFaSong(USART1,FaSong_HuanCun,0,7); 
-		break;
+            break;
 	}
 	for(ZongXunHuan_i=0;ZongXunHuan_i<2060;ZongXunHuan_i++)
 	{
