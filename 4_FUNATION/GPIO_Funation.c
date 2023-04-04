@@ -1,11 +1,14 @@
 #include "stm32f10x.h"
 #include <stdio.h>
 
-GPIO_InitTypeDef GPIO_InitStructure;
-uchar GPIO_i=0;
+
+/********************** ≥ı ºªØGPIO ***********************/
+#if 1
 void GPIO_Init_PeiZhi(void)
 {
-	
+    uchar GPIO_i=0;
+	GPIO_InitTypeDef GPIO_InitStructure;
+    
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD , ENABLE);
 	GPIO_PinRemapConfig(RCC_APB2Periph_AFIO,ENABLE);
 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable,ENABLE);
@@ -166,3 +169,4 @@ void GPIO_Init_PeiZhi(void)
 		Write_ShuChu1_ReSet;
 	}
 } 
+#endif

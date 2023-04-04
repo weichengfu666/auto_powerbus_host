@@ -10,7 +10,10 @@
 	
 #define Write_ShuChu1_ReSet GPIO_WriteBit(GPIOC,GPIO_Pin_9,Bit_SET)
 
-void ZhuJi_Init(void);
+void Host_Init(void);
+void Host_querySerialNum(void);
 void ZongXunHuan(void);
+void Host_reponsePC(void);
+void Host_responseSlave(void);
 #endif
 

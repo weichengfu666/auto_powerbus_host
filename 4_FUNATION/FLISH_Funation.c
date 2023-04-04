@@ -3,8 +3,8 @@
 #include <stdarg.h>
 
 uint32_t EraseCounter=0x00,Address=0x00; 							//擦除计数，写入地址
-uint32_t NbrOfPage = 0x00;														//记录要擦除的页数
-volatile FLASH_Status FLASHStatus = FLASH_COMPLETE;		//擦除完成标志
+uint32_t NbrOfPage = 0x00;											//记录要擦除的页数
+volatile FLASH_Status FLASHStatus = FLASH_COMPLETE;		            //擦除完成标志
 const uint8_t ChengXu_Data[6144] __attribute__((at(0X08010000)));
 uint8_t Flash_ChengXu_Data[2048],Flash_ChengXu_Data2[2048];
 
@@ -21,16 +21,16 @@ void Flash_Write_2K(uint32_t WRITE_START_ADDR)
 	uint16_t Flash_i=0;
 	uint16_t HalfWord=0;
 	__set_PRIMASK(1);
-	FLASH_Unlock();																														//解锁flash
+	FLASH_Unlock();																					//解锁flash
   FLASH_ClearFlag(FLASH_FLAG_EOP|FLASH_FLAG_PGERR|FLASH_FLAG_WRPRTERR);
-	FLASH_ErasePage(WRITE_START_ADDR);																				//擦除flash
+	FLASH_ErasePage(WRITE_START_ADDR);																//擦除flash
 	for(Flash_i=0;Flash_i<1024;Flash_i++)
 	{
 		HalfWord=Flash_ChengXu_Data[Flash_i*2]+Flash_ChengXu_Data[Flash_i*2+1]*256;
 		FLASH_ProgramHalfWord(WRITE_START_ADDR, HalfWord);
 		WRITE_START_ADDR+=2;
 	}
-	FLASH_Lock();																															//锁定flash
+	FLASH_Lock();																					//锁定flash
 	__set_PRIMASK(0);
 }
 /*******************************************************************************************************************

@@ -1,14 +1,19 @@
 #include "stm32f10x.h"
 #include <stdio.h>
 #include <stdarg.h>
+
 u8 GongNeng_HuanCun[2060],GongNeng2_HuanCun[150];       //[0]:功能号，[1 ~ x]:数据
-u8 FaSong_HuanCun[2060],FaSong2_HuanCun[150];           //
+u8 FaSong_HuanCun[2060],FaSong2_HuanCun[150];           
 u16 ZhiLin_ChangDu[256],ZongXunHuan_i=0,ZongXunHuan_j=0,ZhiLin2_ChangDu[256],ZongXunHuan2_i=0,ZongXunHuan2_j=0;
 u16 AnWeiSouXun_Flag=0,AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
 u8 XuLieHao[5]={0x01,0x02,0x03,0x04,0x05};
 u8 FenJi_XuLieHao_H1[5]={0x00,0x00,0x00,0x00,0x00},FenJi_XuLieHao[10][5],FenJiHaoFuZhi_HuanCun=0;
 extern uint8_t ChengXu_Data[2048],Flash_ChengXu_Data[2048],Flash_ChengXu_Data2[2048];
-void ZhuJi_Init(void)
+
+
+/********************** 初始化主机 ***********************/
+#if 1
+void Host_Init(void)
 {
     u16 ZhuJi_Init_i=0;
 	for(ZhuJi_Init_i=0;ZhuJi_Init_i<2048;ZhuJi_Init_i++)
@@ -65,19 +70,31 @@ void ZhuJi_Init(void)
 	Flash_ChengXu_Data2[1]=0x06;
 	Flash_Write_Str(0x08010000,Flash_ChengXu_Data2,0,2); 
 }
+#endif
+/************************ 总循环 *************************/
+#if 1
 void ZongXunHuan(void)
+{
+    Host_querySerialNum();  //主机搜索序列号
+    Host_reponsePC();       //主机应答PC
+    Host_responseSlave();   //主机应答从机
+}
+#endif
+/******************** 主机搜索序列号 *********************/
+#if 1
+void Host_querySerialNum(void)
 {
     /* 分机序列号检测模式 */
 	if(AnWeiSouXun_Flag>0)
 	{
-		if(((AnWeiSouXun_Time>10)&&(AnWeiSouXun_Flag!=41))||((AnWeiSouXun_Time>20)&&(AnWeiSouXun_Flag==41)))//10ms未收到数据进入下一次发送模式,赋值编号是需要大于20ms
+		if(((AnWeiSouXun_Time>10)&&(AnWeiSouXun_Flag!=41))||((AnWeiSouXun_Time>20)&&(AnWeiSouXun_Flag==41)))    //10ms未收到数据进入下一次发送模式,赋值编号是需要大于20ms
 		{
-			if(AnWeiSouXun_Flag>10000)//大于10000表示等待期间未收到过返回数据
+			if(AnWeiSouXun_Flag>10000)                                      //大于10000表示等待期间未收到过返回数据
 			{
 				AnWeiSouXun_Flag-=10000;
-				FenJi_XuLieHao_H1[(AnWeiSouXun_Flag-1)/8]^=(0x80>>((AnWeiSouXun_Flag-1)%8));//计算即将发送的FenJi_XuLieHao_H1,将上一次发送的位置为0
+				FenJi_XuLieHao_H1[(AnWeiSouXun_Flag-1)/8]^=(0x80>>((AnWeiSouXun_Flag-1)%8));                    //计算即将发送的FenJi_XuLieHao_H1,将上一次发送的位置为0
 			}
-			if((AnWeiSouXun_Flag%10000)<40)//未检索完5字节，继续检测
+			if((AnWeiSouXun_Flag%10000)<40)                                 //未检索完5字节，继续检测
 			{
 				FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));//将下一位置为1
 				FaSong_HuanCun[0]=0xff;
@@ -88,9 +105,9 @@ void ZongXunHuan(void)
 				FaSong_HuanCun[5]=FenJi_XuLieHao_H1[2];
 				FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
 				FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
-				AnWeiSouXun_Flag+=10001;//推进一位并进入未收到分机返回模式
-				AnWeiSouXun_Time=1;//时钟开始计时，10ms未收到数据后启动下一次发送
-				TonXunFaSong(USART2,FaSong_HuanCun,0,8);//对分机发送数据
+				AnWeiSouXun_Flag+=10001;                                    //推进一位并进入未收到分机返回模式
+				AnWeiSouXun_Time=1;                                         //时钟开始计时，10ms未收到数据后启动下一次发送
+				TonXunFaSong(USART2,FaSong_HuanCun,0,8);                    //对分机发送数据
 			}else if((AnWeiSouXun_Flag%10000)==40){//结束一次序列号检索		
 				if((FenJi_XuLieHao_H1[0]==0x00)&&(FenJi_XuLieHao_H1[1]==0x00)&&(FenJi_XuLieHao_H1[2]==0x00)&&(FenJi_XuLieHao_H1[3]==0x00)&&(FenJi_XuLieHao_H1[4]==0x00))
 				{
@@ -100,7 +117,7 @@ void ZongXunHuan(void)
 				}
 				if(FenJiHuiYin_Flag<=3)
 				{
-					FenJi_XuLieHao[FenJi_Num][0]=~FenJi_XuLieHao_H1[0];//将得到的缓存取反存入序列号
+					FenJi_XuLieHao[FenJi_Num][0]=~FenJi_XuLieHao_H1[0];     //将得到的缓存取反存入序列号
 					FenJi_XuLieHao[FenJi_Num][1]=~FenJi_XuLieHao_H1[1];
 					FenJi_XuLieHao[FenJi_Num][2]=~FenJi_XuLieHao_H1[2];
 					FenJi_XuLieHao[FenJi_Num][3]=~FenJi_XuLieHao_H1[3];
@@ -116,10 +133,10 @@ void ZongXunHuan(void)
 					FaSong_HuanCun[7]=FenJi_XuLieHao[FenJi_Num][4];
 					FaSong_HuanCun[8]=FenJiHaoFuZhi_HuanCun/256;
 					FaSong_HuanCun[9]=FenJiHaoFuZhi_HuanCun%256;
-//					TonXunFaSong(USART1,FaSong_HuanCun,0,10);//对分机赋值
-					TonXunFaSong(USART2,FaSong_HuanCun,0,10);//对分机赋值
-					AnWeiSouXun_Flag=41;//进入赋值后等待回应模式
-					AnWeiSouXun_Time=1;//时钟开始计时，10ms未收到返回则认为没有此从机
+//					TonXunFaSong(USART1,FaSong_HuanCun,0,10);               //对分机赋值
+					TonXunFaSong(USART2,FaSong_HuanCun,0,10);               //对分机赋值
+					AnWeiSouXun_Flag=41;                                    //进入赋值后等待回应模式
+					AnWeiSouXun_Time=1;                                     //时钟开始计时，10ms未收到返回则认为没有此从机
 				}else{
 					FaSong_HuanCun[0]=0;
 					FaSong_HuanCun[1]=0;
@@ -129,7 +146,7 @@ void ZongXunHuan(void)
 					FaSong_HuanCun[5]=0;
 					FaSong_HuanCun[6]=0;
 					FaSong_HuanCun[7]=0;
-					AnWeiSouXun_Flag=0;//重置发送标志位
+					AnWeiSouXun_Flag=0;                                     //重置发送标志位
 					AnWeiSouXun_Time=0;
 					FenJiHuiYin_Flag=0;
 					FenJi_XuLieHao_H1[0]=0;
@@ -147,13 +164,13 @@ void ZongXunHuan(void)
 				FaSong_HuanCun[5]=0;
 				FaSong_HuanCun[6]=0;
 				FaSong_HuanCun[7]=0;
-				AnWeiSouXun_Flag=0;//重置发送标志位
+				AnWeiSouXun_Flag=0;                                         //重置发送标志位
 				FenJi_XuLieHao_H1[0]=0;
 				FenJi_XuLieHao_H1[1]=0;
 				FenJi_XuLieHao_H1[2]=0;
 				FenJi_XuLieHao_H1[3]=0;
 				FenJi_XuLieHao_H1[4]=0;
-				FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));//计算即将发送的FenJi_XuLieHao_H1
+				FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));                                //计算即将发送的FenJi_XuLieHao_H1
 				FaSong_HuanCun[0]=0xff;
 				FaSong_HuanCun[1]=0xff;
 				FaSong_HuanCun[2]=0x01;
@@ -162,12 +179,18 @@ void ZongXunHuan(void)
 				FaSong_HuanCun[5]=FenJi_XuLieHao_H1[2];
 				FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
 				FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
-				AnWeiSouXun_Flag=10001;//大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
-				AnWeiSouXun_Time=1;//时钟开始计时，10ms未收到数据后启动下一次发送
-				TonXunFaSong(USART2,FaSong_HuanCun,0,8);//对分机发送数据
+				AnWeiSouXun_Flag=10001;                                     //大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
+				AnWeiSouXun_Time=1;                                         //时钟开始计时，10ms未收到数据后启动下一次发送
+				TonXunFaSong(USART2,FaSong_HuanCun,0,8);                    //对分机发送数据
 			}
 		}
 	}
+}
+#endif
+/********************** 主机应答PC ***********************/
+#if 1
+void Host_reponsePC(void)
+{
 	switch(GongNeng_HuanCun[0])
 	{
 		case 1://读取已有模块序列号
@@ -189,13 +212,13 @@ void ZongXunHuan(void)
 			}
             break;
 		case 2://按位搜寻模块序列号 a5 01 02 81 3e
-			AnWeiSouXun_Flag=0;//重置发送标志位
+			AnWeiSouXun_Flag=0;                                                     //重置发送标志位
 			FenJi_XuLieHao_H1[0]=0;
 			FenJi_XuLieHao_H1[1]=0;
 			FenJi_XuLieHao_H1[2]=0;
 			FenJi_XuLieHao_H1[3]=0;
 			FenJi_XuLieHao_H1[4]=0;
-			FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));//计算即将发送的FenJi_XuLieHao_H1
+			FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));    //计算即将发送的FenJi_XuLieHao_H1
 			FaSong_HuanCun[0]=0xff;
 			FaSong_HuanCun[1]=0xff;
 			FaSong_HuanCun[2]=0x01;
@@ -204,9 +227,9 @@ void ZongXunHuan(void)
 			FaSong_HuanCun[5]=FenJi_XuLieHao_H1[2];
 			FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
 			FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
-			AnWeiSouXun_Flag=10001;//大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
-			AnWeiSouXun_Time=1;//时钟开始计时，10ms未收到数据后启动下一次发送
-			TonXunFaSong(USART2,FaSong_HuanCun,0,8);//对分机发送数据
+			AnWeiSouXun_Flag=10001;                                                 //大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
+			AnWeiSouXun_Time=1;                                                     //时钟开始计时，10ms未收到数据后启动下一次发送
+			TonXunFaSong(USART2,FaSong_HuanCun,0,8);                                //对分机发送数据
             break;
 		case 3://设备控制
 			FaSong_HuanCun[0]=0;
@@ -288,8 +311,13 @@ void ZongXunHuan(void)
 	{
 		GongNeng_HuanCun[ZongXunHuan_i]=0;
 	}
-	
-	switch(GongNeng2_HuanCun[0])
+}
+#endif
+/********************* 主机应答从机 **********************/
+#if 1
+void Host_responseSlave(void)
+{
+    switch(GongNeng2_HuanCun[0])
 	{
 		case 1://按位搜寻模块序列号
 			FaSong_HuanCun[0]=0;
@@ -332,4 +360,6 @@ void ZongXunHuan(void)
 		GongNeng2_HuanCun[ZongXunHuan2_i]=0;
 	}
 }
+#endif
+
 

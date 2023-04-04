@@ -2,12 +2,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-extern u16 AnWeiSouXun_Flag;
-extern u16 AnWeiSouXun_Time;
-extern u8 FenJi_XuLieHao_H1[5];
-extern u8 GongNeng_HuanCun[2060], GongNeng2_HuanCun[150];
-extern u16 ZhiLin_ChangDu[256], ZhiLin2_ChangDu[256];
-
 u8  RxData1, RxData2;                                       //缓存一字节串口数据
 u8  PC_RxHuanCun[5][2060], Slave_RxHuanCun[5][150];         //电脑和从机的数据缓存   
 u16 PC_RxHuanCun_i[5], Slave_RxHuanCun_i[5];                //电脑和从机的数据缓存指针
@@ -15,11 +9,14 @@ u8  CRC_HuanCun[2060];                                      //CRC校验数据缓存
 u16 PC_ProcessRecvData_i = 0, PC_ProcessRecvData_j = 0;     
 u16 Slave_ProcessRecvData_i = 0,Slave_ProcessRecvData_j = 0;
 u8  ZhongDuan_TX_Flag[4];
+extern u16 AnWeiSouXun_Flag;
+extern u16 AnWeiSouXun_Time;
+extern u8 FenJi_XuLieHao_H1[5];
+extern u8 GongNeng_HuanCun[2060], GongNeng2_HuanCun[150];
+extern u16 ZhiLin_ChangDu[256], ZhiLin2_ChangDu[256];
 
 
-//***************************************************************************
-//*begin:   串口初始化
-//***************************************************************************
+/*********************** 初始化串口 *************************/
 #if 1
 void USART_InIt_PeiZhi(void)
 {		
@@ -67,16 +64,12 @@ void USART_InIt_PeiZhi(void)
 	USART_ClearITPendingBit(USART2, USART_IT_RXNE);                           //清除中断标志位
 	USART_ClearITPendingBit(USART2, USART_IT_TC);                           	//清除中断标志位
 }
-//***************************************************************************
-//*begin:   串口初始化
-//***************************************************************************
 #endif
 
-//***************************************************************************
-//*begin:   主机-PC串口1通信
-//***************************************************************************
+
+
+/************************ 串口1中断 *************************/
 #if 1
-/******************** 串口1中断 *********************/
 void USART1_IRQHandler(void)    //host connect to PC
 {
     u8 RX1_i;
@@ -107,7 +100,9 @@ void USART1_IRQHandler(void)    //host connect to PC
 			USART_ClearITPendingBit(USART1, USART_IT_TC);              	//清除中断标志位
     }
 }
-/******************** 串口1接收PC数据 *********************/
+#endif
+/********************* 串口1接收PC数据 **********************/
+#if 1
 void PC_RecvData(u8 ZhuJi_Data)
 {
     u16 PC_RecvData_i;
@@ -121,7 +116,9 @@ void PC_RecvData(u8 ZhuJi_Data)
 		}
 	}
 }
-/******************** 串口1处理PC数据 *********************/
+#endif
+/********************* 串口1处理PC数据 **********************/
+#if 1
 void PC_ProcessRecvData(void)
 {
     u16 CRC_wcrc;
@@ -157,16 +154,10 @@ void PC_ProcessRecvData(void)
 		}
 	}
 }
-//***************************************************************************
-//*end:     主机-PC串口1通信
-//***************************************************************************
 #endif
 
-//***************************************************************************
-//*begin:   主机-从机串口2通信
-//***************************************************************************
+/************************ 串口2中断 *************************/
 #if 1
-/******************** 串口2中断 *********************/
 void USART2_IRQHandler(void)    //host connect to slave
 {
     u8 RX_i;
@@ -203,7 +194,9 @@ void USART2_IRQHandler(void)    //host connect to slave
 			USART_ClearITPendingBit(USART2, USART_IT_TC);              	//清除中断标志位
     }
 } 
+#endif
 /******************** 串口2接收从机数据 *********************/
+#if 1
 void Slave_RecvData(u8 ZhuJi2_Data)  //ZhuJi2_Data   --->    Slave_RxHuanCun
 {
     u16 Slave_RecvData_i;
@@ -219,7 +212,9 @@ void Slave_RecvData(u8 ZhuJi2_Data)  //ZhuJi2_Data   --->    Slave_RxHuanCun
 		}
 	}
 }
+#endif
 /******************** 串口2处理从机数据 *********************/
+#if 1
 void Slave_ProcessRecvData(void)  //Slave_RxHuanCun    --->    GongNeng2_HuanCun
 {
     u16 CRC_wcrc;
@@ -255,16 +250,9 @@ void Slave_ProcessRecvData(void)  //Slave_RxHuanCun    --->    GongNeng2_HuanCun
 		}
 	}
 }
-//***************************************************************************
-//*end:     主机-从机串口2通信
-//***************************************************************************
 #endif
-
-//***************************************************************************
-//*begin:   串口发送功能函数
-//***************************************************************************
+/************************ 发送字符串 ************************/
 #if 1
-
 void Str_Data(USART_TypeDef* USARTx,char *StrData)
 {
 	while(*StrData!='\0')
@@ -273,7 +261,9 @@ void Str_Data(USART_TypeDef* USARTx,char *StrData)
 		StrData++;
 	}
 }
-
+#endif
+/********************* 发送带符号的数字 *********************/
+#if 1
 void Num_Data(USART_TypeDef* USARTx,long num) 
 {
   long n=0,num1=0,c=0,js=1,js1;
@@ -315,7 +305,9 @@ void Num_Data(USART_TypeDef* USARTx,long num)
   	n--;
   }
 }
-
+#endif
+/*********************** 发送通信数据 ***********************/
+#if 1
 void TonXunFaSong(USART_TypeDef* USARTx,u8 DianNaoFaSong_HuanCun[],u16 DianNaoFaSong_START_ADDR,u8 DianNaoFaSong_Len)    
 {
     u16 CRC_wcrc;
@@ -333,9 +325,6 @@ void TonXunFaSong(USART_TypeDef* USARTx,u8 DianNaoFaSong_HuanCun[],u16 DianNaoFa
 	USART_SendData(USARTx,CRC_wcrc >> 8);
 	USART_SendData(USARTx,CRC_wcrc & 0x00FF);
 }
-//***************************************************************************
-//*end:     串口发送功能函数
-//***************************************************************************
 #endif
 
 
