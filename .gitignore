@@ -13,6 +13,10 @@ Objects/
 *.map
 *.bin
 *.hex
+*.lst
+*.afx
+*.htm
+*.dep
  
 #Keil Layout File
 *.uvguix.*
