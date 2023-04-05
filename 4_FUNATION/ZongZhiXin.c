@@ -296,6 +296,8 @@ void Host_reponsePC(void)
 		case 100:
 			Flash_Write_Str(0x080107fd,GongNeng_HuanCun,0,7); 
             break;
+		case 101:
+            break;
 		case 255://主机序列号查询
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=0xff;
