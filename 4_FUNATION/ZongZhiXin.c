@@ -316,7 +316,7 @@ void Host_reponsePC(void)
 /********************* 主机应答从机 **********************/
 #if 1
 void Host_responseSlave(void)
-{
+{// 
     switch(GongNeng2_HuanCun[0])
 	{
 		case 1://按位搜寻模块序列号
