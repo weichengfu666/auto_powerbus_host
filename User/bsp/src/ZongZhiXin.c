@@ -352,6 +352,7 @@ void Host_responseSlave(void)
 				FaSong_HuanCun[6]=GongNeng2_HuanCun[7];
 				FaSong_HuanCun[7]=0x00;
 				TonXunFaSong(USART1,FaSong_HuanCun,0,8);//返回主机一条序列号
+                
 //			}
 		break;
 	}

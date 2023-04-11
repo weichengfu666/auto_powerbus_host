@@ -388,6 +388,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\main.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\app\inc\bsp.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -419,11 +424,6 @@
               <FilePath>..\..\User\bsp\src\NVIC_Funation.c</FilePath>
             </File>
             <File>
-              <FileName>ShuJuChuLi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\src\ShuJuChuLi.c</FilePath>
-            </File>
-            <File>
               <FileName>TIM_Funation.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\TIM_Funation.c</FilePath>
@@ -437,6 +437,16 @@
               <FileName>ZongZhiXin.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\ZongZhiXin.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_debug.c</FilePath>
             </File>
           </Files>
         </Group>
