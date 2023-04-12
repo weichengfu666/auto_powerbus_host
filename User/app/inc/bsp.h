@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "USART_Funation.h"
 #include "GPIO_Funation.h"
@@ -17,6 +18,7 @@
 #include "bsp_cpu_flash.h"
 #include "bsp_oled.h"
 #include "bsp_debug.h"
+#include "flash.h"
 
 #endif
 

@@ -325,7 +325,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
@@ -447,6 +447,11 @@
               <FileName>bsp_debug.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_debug.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\flash.c</FilePath>
             </File>
           </Files>
         </Group>

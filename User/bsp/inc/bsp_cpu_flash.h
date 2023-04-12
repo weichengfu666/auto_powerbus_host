@@ -13,6 +13,8 @@
 #ifndef _BSP_CPU_FLASH_H_
 #define _BSP_CPU_FLASH_H_
 
+#include "bsp.h"
+
 #define FLASH_BASE_ADDR	0x08000000			/* Flash基地址 */
 #define	FLASH_SIZE		(512*1024)		/* Flash 容量 */
 
@@ -23,6 +25,8 @@
 #define FLASH_REQ_WRITE		1	/* Flash不需要擦除，直接写 */
 #define FLASH_REQ_ERASE		2	/* Flash需要先擦除,再写 */
 #define FLASH_PARAM_ERR		3	/* 函数参数错误 */
+
+
 
 void bsp_TestCpuFlash(void);
 uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize);
