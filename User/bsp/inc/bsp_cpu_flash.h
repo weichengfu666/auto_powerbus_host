@@ -24,6 +24,7 @@
 #define FLASH_REQ_ERASE		2	/* Flash需要先擦除,再写 */
 #define FLASH_PARAM_ERR		3	/* 函数参数错误 */
 
+void bsp_TestCpuFlash(void);
 uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize);
 uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize);
 uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSize);

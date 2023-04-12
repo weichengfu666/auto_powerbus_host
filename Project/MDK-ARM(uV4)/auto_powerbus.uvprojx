@@ -399,6 +399,11 @@
           <GroupName>BSP</GroupName>
           <Files>
             <File>
+              <FileName>FLISH_Funation.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\FLISH_Funation.c</FilePath>
+            </File>
+            <File>
               <FileName>bsp_cpu_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_cpu_flash.c</FilePath>
@@ -407,11 +412,6 @@
               <FileName>CRC_Funation.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\CRC_Funation.c</FilePath>
-            </File>
-            <File>
-              <FileName>FLISH_Funation.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\src\FLISH_Funation.c</FilePath>
             </File>
             <File>
               <FileName>GPIO_Funation.c</FileName>

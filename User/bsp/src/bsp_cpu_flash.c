@@ -110,7 +110,7 @@ uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSiz
 			{
 				return FLASH_REQ_ERASE;		/* 需要擦除后再写 */
 			}
-			else
+			else /* 为0xFF不用擦除 */
 			{
 				ucIsEqu = 0;	/* 不相等，需要写 */
 			}
@@ -159,10 +159,11 @@ uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulS
 		return 0;
 	}
 
-	/* 长度为奇数时不继续操作  */
+	/* 长度为奇数时读取2k到缓存，修改内容，再写回flash  */
 	if ((_ulSize % 2) != 0)
 	{
-		return 1;
+        Flash_Write_Str(_ulFlashAddr, _ucpSrc, 0, _ulSize);
+		return 0;
 	}	
 
 	ucRet = bsp_CmpCpuFlash(_ulFlashAddr, _ucpSrc, _ulSize);
@@ -215,6 +216,34 @@ uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulS
 		return 0;
 	}
 	return 2;
+}
+
+
+void bsp_TestCpuFlash(void)
+{
+    uint8_t testLen = 4;
+    uint8_t testSrc[10] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10};
+    uint8_t testDst[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    
+    
+    if(bsp_WriteCpuFlash(0x08020000,testSrc,testLen) == 0)
+    {
+        if(bsp_ReadCpuFlash(0x08020000, testDst,testLen) == 0)
+        {
+            DEBUG_String(1,1,"testSrc:");
+            DEBUG_Memery(2,testSrc,testLen);
+            DEBUG_String(3,1,"testDst:");
+            DEBUG_Memery(4,testDst,testLen+4);           
+        }
+        else
+        {
+            DEBUG_String(1,1,"ReadFlashError");
+        }
+    }
+    else
+    {
+        DEBUG_String(1,1,"writeFlashError");
+    }
 }
 
 /***************************** 皇甫实景娱乐公司 (END OF FILE) *********************************/

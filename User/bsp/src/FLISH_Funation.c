@@ -95,3 +95,21 @@ void Flash_Write_Str(uint32_t WRITE_START_ADDR,u8 Flash_Write_Data[],u32 First_a
 	}
 }
 
+
+void FLASH_Test(void)
+{
+    uint8_t testLen = 4;
+    uint8_t testSrc2[10] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x10};
+    uint8_t testSrc1[10] = {0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa,0xaa};
+    uint8_t testDst[10] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    
+    
+    Flash_Write_Str(0x08020000,testSrc1,0,testLen);
+    Flash_Write_Str(0x08020000,testSrc2,0,testLen);
+    FLASH_ReadByte(0x08020000, testDst,testLen);
+    DEBUG_String(1,1,"testSrc1:");
+    DEBUG_Memery(2,testSrc1,testLen);
+    DEBUG_String(3,1,"testDst:");
+    DEBUG_Memery(4,testDst,testLen);           
+}
+

@@ -279,8 +279,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\User\bsp\src\bsp_cpu_flash.c</PathWithFileName>
-      <FilenameWithoutPath>bsp_cpu_flash.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\User\bsp\src\FLISH_Funation.c</PathWithFileName>
+      <FilenameWithoutPath>FLISH_Funation.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -291,8 +291,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\User\bsp\src\CRC_Funation.c</PathWithFileName>
-      <FilenameWithoutPath>CRC_Funation.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\User\bsp\src\bsp_cpu_flash.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_cpu_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -303,8 +303,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\User\bsp\src\FLISH_Funation.c</PathWithFileName>
-      <FilenameWithoutPath>FLISH_Funation.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\User\bsp\src\CRC_Funation.c</PathWithFileName>
+      <FilenameWithoutPath>CRC_Funation.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

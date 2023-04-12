@@ -85,7 +85,7 @@ void Host_querySerialNum(void)
     /* 从机序列号检测模式 */
 	if(AnWeiSouXun_Flag>0)
 	{
-		if(((AnWeiSouXun_Time>10)&&(AnWeiSouXun_Flag!=41))||((AnWeiSouXun_Time>20)&&(AnWeiSouXun_Flag==41)))    //10ms未收到数据进入下一次发送模式,赋值编号是需要大于20ms
+		if(((AnWeiSouXun_Time>10)&&(AnWeiSouXun_Flag!=41))||((AnWeiSouXun_Time>20)&&(AnWeiSouXun_Flag==41)))    //10ms未收到数据进入下一次发送模式,赋值编号是需要大于20ms（因为主机发送数据到从机接收并解析返回数据给主机并接收到的这段时间是10ms以内，赋值需要20ms让从机收到并处理数据）
 		{
 			if(AnWeiSouXun_Flag>10000)                                      //大于10000表示等待期间未收到过返回数据
 			{
@@ -105,8 +105,8 @@ void Host_querySerialNum(void)
 				FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
 				FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
 				AnWeiSouXun_Flag+=10001;                                    //推进一位并进入未收到分机返回模式
-				AnWeiSouXun_Time=1;                                         //时钟开始计时，10ms未收到数据后启动下一次发送
 				TonXunFaSong(USART2,FaSong_HuanCun,0,8);                    //对分机发送数据
+				AnWeiSouXun_Time=1;                                         //时钟开始计时，10ms未收到数据后启动下一次发送
 			}
             else if((AnWeiSouXun_Flag%10000)==40)   //完成一次序列号检索
             {	
