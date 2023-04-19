@@ -1,4 +1,5 @@
 #include "bsp.h"
+#include "CRC_Funation.h"
 
 /********************** 16Î»CRCÐ£Ñé ***********************/
 #if 1

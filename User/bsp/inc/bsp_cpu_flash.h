@@ -28,10 +28,11 @@
 
 
 
-void bsp_TestCpuFlash(void);
-uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize);
-uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize);
+void    bsp_TestCpuFlash(void);
 uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSize);
+uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize);
+uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize);       // （ BUG: 不支持写入地址和写入字节数为奇数，写入某页时，如果需要擦除，则会破坏整页数据 ）不建议使用
+uint8_t bsp_WriteCpuFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize);    // （ 可配置操作的flash范围，在指定flash范围内，可以任意地址，任意字节数修改 ）推荐使用
 
 #endif
 

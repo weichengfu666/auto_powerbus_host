@@ -10,15 +10,18 @@ void bsp_init(void)
 	USART_InIt_PeiZhi();
 	Host_Init(); 
     OLED_Init();
+    flash_ReadSlaveDeviceSerialNumArr();
 }
+
 int main(void)
 {
     bsp_init();
    
-	USART_SendData(USART1,0x52);
-	USART_SendData(USART1,0x61);
-	USART_SendData(USART2,0x52);
-	USART_SendData(USART2,0x61);
+	USART_SendData( USART1, 0x52 );
+	USART_SendData( USART1, 0x61 );
+	USART_SendData( USART2, 0x52);
+	USART_SendData( USART2, 0x61);
+
     while (1) 
     {
         ZongXunHuan(); 

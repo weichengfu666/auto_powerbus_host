@@ -1,4 +1,5 @@
 #include "bsp.h"
+#include "FLISH_Funation.h"
 
 uint32_t EraseCounter=0x00,Address=0x00; 							//擦除计数，写入地址
 uint32_t NbrOfPage = 0x00;											//记录要擦除的页数

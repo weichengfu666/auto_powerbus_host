@@ -1,5 +1,5 @@
-#include "OLED_Font.h"
 #include "bsp.h"
+#include "OLED_Font.h"
 
 /*引脚配置*/
 #define OLED_W_SCL(x)		GPIO_WriteBit(GPIOB, GPIO_Pin_9, (BitAction)(x))
