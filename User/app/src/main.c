@@ -16,11 +16,10 @@ void bsp_init(void)
 int main(void)
 {
     bsp_init();
-   
-	USART_SendData( USART1, 0x52 );
-	USART_SendData( USART1, 0x61 );
-	USART_SendData( USART2, 0x52);
-	USART_SendData( USART2, 0x61);
+	USART_SendData( USART_PC, 0x52 );
+	USART_SendData( USART_PC, 0x61 );
+	USART_SendData( USART_SLAVE, 0x52);
+	USART_SendData( USART_SLAVE, 0x61);
 
     while (1) 
     {
