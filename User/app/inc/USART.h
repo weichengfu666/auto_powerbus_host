@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define USART_PC        USART2
-#define USART_SLAVE   USART1
+#define USART_PC        USART1
+#define USART_SLAVE   USART2
 
 void USART_InIt_PeiZhi(void);
 void Num_Data(USART_TypeDef* USARTx,long num);

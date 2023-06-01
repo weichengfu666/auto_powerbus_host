@@ -1,5 +1,5 @@
 #include "bsp.h"
-#include "TIM_Funation.h"
+#include "TIM.h"
 
 ulong Time3=0;  
 uchar Time_500Ms_Flag=0;

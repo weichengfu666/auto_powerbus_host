@@ -1,5 +1,5 @@
 #include "bsp.h"
-#include "NVIC_Funation.h"
+#include "NVIC.h"
 
 /********************** ≥ı ºªØNVIC ***********************/
 #if 1

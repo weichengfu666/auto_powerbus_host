@@ -9,7 +9,6 @@ void bsp_init(void)
 	NVIC_Init_PeiZhi();
 	USART_InIt_PeiZhi();
 	Host_Init(); 
-    OLED_Init();
     flash_ReadSlaveDeviceSerialNumArr();
 }
 

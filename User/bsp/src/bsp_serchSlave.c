@@ -1,5 +1,5 @@
 #include "bsp.h"
-#include "flash.h"
+#include "bsp_serchSlave.h"
 
 uint16_t    SlaveDeviceCount;
 uint16_t    DisplayPacketCount;
@@ -18,7 +18,7 @@ int8_t flash_ReadSlaveDeviceSerialNumArr(void)
 {
     if( ( SlaveDeviceCount = flash_ReadSlaveDeviceCount() ) > 0)//先从flash读从机数到ram的 SlaveDeviceCount，如果大于0，就将从机序列号从flash读到ram的 SlaveDeviceSerialNumArr
     {
-        if( bsp_ReadCpuFlash( slaveDeviceSerialNumArr_addr, ( uint8_t * ) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5 ) == 0 )
+        if( readFlashStr( slaveDeviceSerialNumArr_addr, ( uint8_t * ) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5 ) == 0 )
         {
             return 0;
         }
@@ -44,7 +44,7 @@ int8_t flash_WriteSlaveDeviceSerialNumArr(void)
     if( SlaveDeviceCount > 0 )//先从ram的 SlaveDeviceCount 读从机数，如果大于0，就将从机序列号从ram的 SlaveDeviceSerialNumArr 写入flash
     {
         flash_WriteSlaveDeviceCount();//写从机数到flash
-        if( bsp_WriteCpuFlashStr( slaveDeviceSerialNumArr_addr, (uint8_t *) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5) == 0 )
+        if( writeFlashStr( slaveDeviceSerialNumArr_addr, (uint8_t *) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5) == 0 )
         {
             return 0;
         }
@@ -67,7 +67,7 @@ int8_t flash_WriteSlaveDeviceSerialNumArr(void)
 */
 int8_t flash_WriteSlaveDeviceCount( void )
 {
-    if( bsp_WriteCpuFlashStr( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
+    if( writeFlashStr( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
     {
         return 0; 
     }
@@ -85,7 +85,7 @@ int8_t flash_WriteSlaveDeviceCount( void )
 */
 int16_t flash_ReadSlaveDeviceCount( void )
 {
-    if( bsp_ReadCpuFlash( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
+    if( readFlashStr( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
     {
         if( SlaveDeviceCount == 0xFFFF)     //flash擦除后的值为0xFFFF
         {
@@ -107,7 +107,7 @@ int16_t flash_ReadSlaveDeviceCount( void )
 */
 int8_t flash_WriteDisplayPacketCount( void )
 {
-    if( bsp_WriteCpuFlashStr( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
+    if( writeFlashStr( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
     {
         return 0;
     }
@@ -125,7 +125,7 @@ int8_t flash_WriteDisplayPacketCount( void )
 */
 int16_t flash_ReadDisplayPacketCount( void )
 {
-    if(bsp_ReadCpuFlash( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
+    if(readFlashStr( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
     {
         return DisplayPacketCount;
     }
@@ -143,14 +143,9 @@ int16_t flash_ReadDisplayPacketCount( void )
 */
 void flash_Test( void )
 {
-    uint16_t temp;
-   
     flash_WriteSlaveDeviceCount();           //测试读写从机数到CPU 内部Flash
-    temp = flash_ReadSlaveDeviceCount();
-    DEBUG_Num( 1, 1, temp, 10);
+    flash_ReadSlaveDeviceCount();
     
     flash_WriteDisplayPacketCount();        //测试读写效果包数到CPU 内部Flash
-    temp = flash_ReadDisplayPacketCount();
-    DEBUG_Num( 2, 1, temp, 10 );
-    
+    flash_ReadDisplayPacketCount();
 }

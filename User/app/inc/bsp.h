@@ -7,18 +7,14 @@
 #include <string.h>
 
 #include "absacc.h"
-#include "bsp_cpu_flash.h"
-#include "CAN_Funation.h"
-#include "CRC_Funation.h"
-#include "GPIO_Funation.h"
-#include "NVIC_Funation.h"
-#include "TIM_Funation.h"
-#include "USART_Funation.h"
+#include "CRC16.h"
+#include "GPIO.h"
+#include "NVIC.h"
+#include "TIM.h"
+#include "USART.h"
 #include "ZongZhiXin.h"
-#include "bsp_oled.h"
-#include "bsp_debug.h"
-#include "flash.h"
-#include "FLISH_Funation.h"
+#include "bsp_flash.h"
+#include "bsp_serchSlave.h"
 
 #endif
 

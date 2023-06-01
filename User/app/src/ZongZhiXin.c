@@ -49,6 +49,11 @@ void Host_Init(void)
 	ZhiLin_ChangDu[7]=5;//指令长度初始化
 	ZhiLin_ChangDu[0xf0-1]=5;//指令长度初始化
 	ZhiLin_ChangDu[254]=5;//指令长度初始化
+    ZhiLin_ChangDu[0x20-1]=9;           //LED开关
+    ZhiLin_ChangDu[0x21-1]=9;           //LED亮度设定
+    ZhiLin_ChangDu[0x22-1]=14;         //LED循环呼吸
+    ZhiLin_ChangDu[0x23-1]=13;         //LED循环（单次）渐变
+    ZhiLin_ChangDu[0x24-1]=15;         //LED循环闪烁
 	ZhiLin2_ChangDu[0]=4;//指令长度初始化
 	ZhiLin2_ChangDu[1]=11;//指令长度初始化
 }
@@ -193,7 +198,7 @@ void Host_reponsePC( void )
 {
 	switch( GongNeng_HuanCun[ 0 ] )
 	{
-		case 0x01://读取已有从机序列号
+		case 0x01://读取已有从机序列号 A5 01 01 80 7E
 			FaSong_HuanCun[ 0 ] = 0x00;//地址
 			FaSong_HuanCun[ 1 ] = 0x01;//功能帧
 			FaSong_HuanCun[ 2 ] = SlaveDeviceCount / 256;
@@ -211,7 +216,7 @@ void Host_reponsePC( void )
 				TonXunFaSong(USART_PC,FaSong_HuanCun,0,7); //返回从机序列号
 			}
             break;
-		case 0x02://按位搜寻从机序列号 a5 01 02 81 3e
+		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E
             SlaveDeviceCount = 0;                                                   //清空 ram 历史从机设备数
             flash_WriteSlaveDeviceCount();                                          //清空 flash 历史从机设备数
 			AnWeiSouXun_Flag=0;                                                     //重置发送标志位
@@ -252,7 +257,13 @@ void Host_reponsePC( void )
 			FaSong_HuanCun[3]=GongNeng_HuanCun[2];
 			TonXunFaSong(USART_PC,FaSong_HuanCun,0,4); 
             break;
-		case 0x05://联动效果执行
+		case 0x05://联动效果执行 A5 01 05 00 01 01 A0
+			FaSong_HuanCun[0]=0xff;
+			FaSong_HuanCun[1]=0xff;
+			FaSong_HuanCun[2]=0x06;
+			FaSong_HuanCun[3]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[4]=GongNeng_HuanCun[2];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5); //发给从机
 			FaSong_HuanCun[0]=0x00;
 			FaSong_HuanCun[1]=0x05;
 			FaSong_HuanCun[2]=GongNeng_HuanCun[1];
@@ -268,7 +279,7 @@ void Host_reponsePC( void )
 			FaSong_HuanCun[5]=GongNeng_HuanCun[4];
 			TonXunFaSong(USART_PC,FaSong_HuanCun,0,4); 
             break;
-		case 0x07://程序接收
+		case 0x07://程序接收 
 			FaSong_HuanCun[0]=0x00;
 			FaSong_HuanCun[1]=0x07;
 			FaSong_HuanCun[2]=GongNeng_HuanCun[1];
@@ -281,7 +292,7 @@ void Host_reponsePC( void )
 //			Flash_Write_2K(0x08000000+GongNeng_HuanCun[1]*65536+GongNeng_HuanCun[2]*256+GongNeng_HuanCun[3]);
 //			TonXunFaSong(USART_PC,FaSong_HuanCun,0,5); 
             break;
-		case 0x08://清除从机序列号
+		case 0x08://清除从机序列号 A5 01 08 86 BE
 			FaSong_HuanCun[0]=0xff;
 			FaSong_HuanCun[1]=0xff;
 			FaSong_HuanCun[2]=0x07;
@@ -298,9 +309,67 @@ void Host_reponsePC( void )
 		case 0x64:
 //			Flash_Write_Str(0x080107fd,GongNeng_HuanCun,0,7); 
             break;
-		case 0x65:
+		case 0x20://LED开关
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            TonXunFaSong(USART1,FaSong_HuanCun,0,5);
             break;
-		case 0xff://查询主机序列号
+		case 0x21://LED亮度设定
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            TonXunFaSong(USART1,FaSong_HuanCun,0,5);
+            break;
+		case 0x22://LED循环呼吸
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,10);
+            TonXunFaSong(USART1,FaSong_HuanCun,0,10);
+            break;
+		case 0x23://LED循环（单次）渐变
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,9);
+            TonXunFaSong(USART1,FaSong_HuanCun,0,9);
+            break;
+		case 0x24://LED循环闪烁
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
+            FaSong_HuanCun[10]=GongNeng_HuanCun[10];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,11);
+            TonXunFaSong(USART1,FaSong_HuanCun,0,11);
+            break;
+		case 0xff://查询主机序列号 A5 01 FF 00 FF
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=0xff;
 			FaSong_HuanCun[2]=XuLieHao[0];

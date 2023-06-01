@@ -1,5 +1,5 @@
 #include "bsp.h"
-#include "USART_Funation.h"
+#include "USART.h"
 
 u8  RxData1, RxData2;                                       //缓存一字节串口数据
 u8  PC_RxHuanCun[5][2060], Slave_RxHuanCun[5][150];         //电脑和从机的数据缓存   

@@ -15,12 +15,46 @@
 */
 
 #include "bsp.h"
-#include "bsp_cpu_flash.h"
+#include "bsp_flash.h"
 
+static uint8_t Flash2k_PageArr[PAGE_SIZE][2048];                                                   //flash缓存页，最多一次写入 PAGE_SIZE 缓存页到flash
 
 /*
 *********************************************************************************************************
-*	函 数 名: bsp_WriteCpuFlashStr
+*	函 数 名: readFlashStr
+*	功能说明: 读取CPU Flash的内容
+*	形    参：_ucpDst : 目标缓冲区
+*			 _ulFlashAddr : 起始地址
+*			 _ulSize : 数据大小（单位是字节）
+*	返 回 值: 0=成功，1=失败
+*********************************************************************************************************
+*/
+uint8_t readFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize)
+{
+	uint32_t i;
+
+	/* 如果偏移地址超过芯片容量，则不改写输出缓冲区 */
+	if (_ulFlashAddr + _ulSize > FLASH_BASE_ADDR + FLASH_SIZE)
+	{
+		return 1;
+	}
+
+	/* 长度为0时不继续操作,否则起始地址为奇地址会出错 */
+	if (_ulSize == 0)
+	{
+		return 1;
+	}
+
+	for (i = 0; i < _ulSize; i++)
+	{
+		*_ucpDst++ = *(uint8_t *)_ulFlashAddr++;
+	}
+
+	return 0;
+}
+/*
+*********************************************************************************************************
+*	函 数 名: writeFlashStr
 *	功能说明: 写数据到CPU 内部Flash。先读取要修改的页到缓存，修改缓存数据，然后再写回flash （ 在指定flash范围内，可以任意地址，任意字节数修改 ）
 *	形    参: _ulFlashAddr : Flash地址
 *			 _ucpSrc : 数据缓冲区
@@ -28,15 +62,7 @@
 *	返 回 值: 0-成功，1-数据长度或地址溢出，2-写Flash出错(估计Flash寿命到)
 *********************************************************************************************************
 */
-/* 设置有效flash地址范围，单次可写入最大页数 */
-
-#define FLASH_STARTADDR 0X08020000      //可写入flash的起始地址
-#define FLASH_WRITESIZE 0x10000         //可写入flash的存储大小
-#define PAGE_SIZE 4                     //单次可写入最大页数
-//const uint8_t flashArr[ FLASH_WRITESIZE ] __attribute__( ( at( FLASH_STARTADDR ) ) );       //从 FLASH_STARTADDR 开始，先定义 FLASH_WRITESIZE 可存储数据
-uint8_t Flash2k_PageArr[PAGE_SIZE][2048];                                                   //flash缓存页，最多一次写入 PAGE_SIZE 缓存页到flash
-
-uint8_t bsp_WriteCpuFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize) /* 读取页到缓存，修改内容，再写回flash  */
+uint8_t writeFlashStr ( uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize ) /* 读取页到缓存，修改内容，再写回flash  */
 {
     int32_t i;
     uint16_t usTemp;                            //缓存半字
@@ -77,7 +103,6 @@ uint8_t bsp_WriteCpuFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _
         {
             for( i = 0; i < 2048; i++ )
             {
-//                Flash2k_PageArr[ page_index ][ i ] = flashArr[ ulFlashAddr_pageStart - FLASH_STARTADDR + i + page_index * 2048 ]; 
                 Flash2k_PageArr[ page_index ][ i ] = *(uint8_t *) ( ulFlashAddr_pageStart + i + page_index * 2048 ); 
             }
         }
@@ -122,6 +147,10 @@ uint8_t bsp_WriteCpuFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _
     }
     return 1;
 }
+#if 0
+/* 设置有效flash地址范围，单次可写入最大页数 */
+//#define FLASH_WRITESIZE 0x10000         //可写入flash的存储大小
+//const uint8_t flashArr[ FLASH_WRITESIZE ] __attribute__( ( at( FLASH_STARTADDR ) ) );       //从 FLASH_STARTADDR 开始，先定义 FLASH_WRITESIZE 可存储数据
 /*
 *********************************************************************************************************
 *	函 数 名: bsp_GetSector
@@ -140,7 +169,7 @@ uint32_t bsp_GetSector(uint32_t _ulWrAddr)
 }
 /*
 *********************************************************************************************************
-*	函 数 名: bsp_ReadCpuFlash
+*	函 数 名: readFlashStr
 *	功能说明: 读取CPU Flash的内容
 *	形    参：_ucpDst : 目标缓冲区
 *			 _ulFlashAddr : 起始地址
@@ -148,7 +177,7 @@ uint32_t bsp_GetSector(uint32_t _ulWrAddr)
 *	返 回 值: 0=成功，1=失败
 *********************************************************************************************************
 */
-uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize)
+uint8_t readFlashStr(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize)
 {
 	uint32_t i;
 
@@ -319,5 +348,6 @@ uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSiz
 		return FLASH_REQ_WRITE;	/* Flash不需要擦除，直接写 */
 	}
 }
+#endif
 
 /***************************** 皇甫实景娱乐公司 (END OF FILE) *********************************/
