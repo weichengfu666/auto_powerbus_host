@@ -3,26 +3,39 @@
 
 #include "bsp.h"
 
-typedef enum FlashAddr{
-    slaveDeviceCount_addr           = 0x08020000,                                                       //从机数地址
-    displayPacketCount_addr         = 0x08020002,                                                       //效果包数地址
-    displayPacketVectorArr_addr     = 0x08020004,   displayPacketVectorArr_len     = 200,               //效果包向量表首地址，数组长度
-    slaveDeviceSerialNumArr_addr    = 0x08020800,   slaveDeviceSerialNumArr_len    = 512                //从机序列号首地址，数组长度
+#define SlaveArrLen 128    
+#define packArrLen  16
+
+typedef struct {
+    uint32_t    packAddr;                      //效果包地址
+    uint16_t    packLen;                       //效果包长度
+}PackTypeDef;
+
+typedef struct {
+    uint8_t     serialArr [ 5 ];              //初始序列号
+    uint8_t     assignArr [ 2 ];            //赋值序列号
+    uint8_t              packSize;              //效果包数量
+    PackTypeDef     packArr[ packArrLen ];              //16个效果包
+}SlaveTypeDef;
+
+typedef enum {
+    slaveSize_addr        = 0x08020000,                                                       //从机总数地址
+    slaveArr_addr         = 0x08020002,                                                       //从机结构体起始地址
 }FlashAddr_typedef;
 
-extern uint16_t  SlaveDeviceCount;
-extern uint16_t  DisplayPacketCount;
-extern uint8_t   DisplayPacketVectorArr[displayPacketVectorArr_len][4];
-extern uint8_t   SlaveDeviceSerialNumArr[slaveDeviceSerialNumArr_len][5];
 
-void    flash_Test(void);//测试程序
-int8_t  flash_WriteSlaveDeviceCount(void);          //写从机数到flash
-int16_t flash_ReadSlaveDeviceCount(void);           //读从机数从flash
-int8_t  flash_WriteDisplayPacketCount(void);        //写效果包数到flash
-int16_t flash_ReadDisplayPacketCount(void);         //读效果包数从flash
-int8_t  flash_WriteSlaveDeviceSerialNumArr(void);   //写从机序列号到flash
-int8_t  flash_ReadSlaveDeviceSerialNumArr(void);    //读从机序列号从flash
 
+extern uint16_t            SlaveSize;                                     //从机总数，0x02 字节
+extern SlaveTypeDef    SlaveArr[ SlaveArrLen ];               //128个从机结构体，0x4400 字节
+
+//从机总数
+uint16_t readSlaveSize( void );        //读flash --> 到缓存
+uint16_t writeSlaveSize( void );       //写缓存 --> flash
+uint16_t clearSlaveSize( void );       //清除缓存和flash
+//从机结构体
+uint16_t readSlaveArr( void );         //读flash --> 到缓存
+uint16_t wirteSlaveArr( void );         //写缓存 --> flash 
+uint16_t clearSlaveArr( void );         //清除缓存和flash
 
 #endif
 

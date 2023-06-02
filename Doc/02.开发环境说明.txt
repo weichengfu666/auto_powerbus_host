@@ -1,0 +1,4 @@
+Ð¾Æ¬£º	
+		ÐÍºÅ£º	STM32F103RE
+		Flash£º	512 kBytes
+		RAM£º	64 kBytes

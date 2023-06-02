@@ -31,14 +31,7 @@ void Host_Init(void)
 	{
 		ZhiLin2_ChangDu[ZhuJi_Init_i]=0;
 	}
-	for(ZhuJi_Init_i=0;ZhuJi_Init_i<10;ZhuJi_Init_i++)
-	{
-		SlaveDeviceSerialNumArr[ ZhuJi_Init_i ][ 0 ]=0;
-		SlaveDeviceSerialNumArr[ ZhuJi_Init_i ][ 1 ]=0;
-		SlaveDeviceSerialNumArr[ ZhuJi_Init_i ][ 2 ]=0;
-		SlaveDeviceSerialNumArr[ ZhuJi_Init_i ][ 3 ]=0;
-		SlaveDeviceSerialNumArr[ ZhuJi_Init_i ][ 4 ]=0;
-	}
+
 	ZhiLin_ChangDu[0]=5;//指令长度初始化
 	ZhiLin_ChangDu[1]=5;//指令长度初始化
 	ZhiLin_ChangDu[2]=9;//指令长度初始化
@@ -118,29 +111,28 @@ void Host_querySerialNum(void)
                 //未收到回应的检索次数小于3次，对从机赋值，继续检索
 				if(FenJiHuiYin_Flag<=3)  
 				{
-					SlaveDeviceSerialNumArr[SlaveDeviceCount][0]=~FenJi_XuLieHao_H1[0];     //将得到的缓存取反存入序列号
-					SlaveDeviceSerialNumArr[SlaveDeviceCount][1]=~FenJi_XuLieHao_H1[1];
-					SlaveDeviceSerialNumArr[SlaveDeviceCount][2]=~FenJi_XuLieHao_H1[2];
-					SlaveDeviceSerialNumArr[SlaveDeviceCount][3]=~FenJi_XuLieHao_H1[3];
-					SlaveDeviceSerialNumArr[SlaveDeviceCount][4]=~FenJi_XuLieHao_H1[4];
+					SlaveArr[ SlaveSize ].serialArr[0] = ~FenJi_XuLieHao_H1[0];     //将得到的缓存取反存入序列号
+					SlaveArr[ SlaveSize ].serialArr[1] =~FenJi_XuLieHao_H1[1];
+					SlaveArr[ SlaveSize ].serialArr[2] =~FenJi_XuLieHao_H1[2];
+					SlaveArr[ SlaveSize ].serialArr[3] =~FenJi_XuLieHao_H1[3];
+					SlaveArr[ SlaveSize ].serialArr[4] =~FenJi_XuLieHao_H1[4];
 					FaSong_HuanCun[0]=0xff;
 					FaSong_HuanCun[1]=0xff;
 					FaSong_HuanCun[2]=0x02;
-					FaSong_HuanCun[3]=SlaveDeviceSerialNumArr[SlaveDeviceCount][0];
-					FaSong_HuanCun[4]=SlaveDeviceSerialNumArr[SlaveDeviceCount][1];
-					FaSong_HuanCun[5]=SlaveDeviceSerialNumArr[SlaveDeviceCount][2];
-					FaSong_HuanCun[6]=SlaveDeviceSerialNumArr[SlaveDeviceCount][3];
-					FaSong_HuanCun[7]=SlaveDeviceSerialNumArr[SlaveDeviceCount][4];
-					FaSong_HuanCun[8]= ( SlaveDeviceCount + 1 ) / 256;      //从机编号从1开始
-					FaSong_HuanCun[9]= ( SlaveDeviceCount + 1 ) % 256;
-//					TonXunFaSong(USART_PC,FaSong_HuanCun,0,10);               //对从机编号赋值
+					FaSong_HuanCun[3]=SlaveArr[ SlaveSize ].serialArr[0];
+					FaSong_HuanCun[4]=SlaveArr[ SlaveSize ].serialArr[1];
+					FaSong_HuanCun[5]=SlaveArr[ SlaveSize ].serialArr[2];
+					FaSong_HuanCun[6]=SlaveArr[ SlaveSize ].serialArr[3];
+					FaSong_HuanCun[7]=SlaveArr[ SlaveSize ].serialArr[4];
+					FaSong_HuanCun[8]= ( SlaveSize + 1 ) / 256;      //从机编号从1开始
+					FaSong_HuanCun[9]= ( SlaveSize + 1 ) % 256;
 					TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,10);               //对从机编号赋值
 					AnWeiSouXun_Flag=41;                                    //进入赋值后等待回应模式
 					AnWeiSouXun_Time=1;                                     //时钟开始计时，10ms未收到返回则认为没有此从机
 				}
                 else //检索未回应的次数超过3次，结束检索
                 {
-                    flash_WriteSlaveDeviceSerialNumArr();
+                    wirteSlaveArr();
 					FaSong_HuanCun[0]=0;
 					FaSong_HuanCun[1]=0;
 					FaSong_HuanCun[2]=0;
@@ -199,26 +191,26 @@ void Host_reponsePC( void )
 	switch( GongNeng_HuanCun[ 0 ] )
 	{
 		case 0x01://读取已有从机序列号 A5 01 01 80 7E
+            readSlaveArr();                     //读flash到ram
 			FaSong_HuanCun[ 0 ] = 0x00;//地址
 			FaSong_HuanCun[ 1 ] = 0x01;//功能帧
-			FaSong_HuanCun[ 2 ] = SlaveDeviceCount / 256;
-			FaSong_HuanCun[ 3 ] = SlaveDeviceCount % 256;
+			FaSong_HuanCun[ 2 ] = SlaveSize / 256;
+			FaSong_HuanCun[ 3 ] = SlaveSize % 256;
 			TonXunFaSong( USART_PC, FaSong_HuanCun, 0, 4);  //返回检测到的从机数
-			for( ZongXunHuan_i = 0; ZongXunHuan_i < SlaveDeviceCount; ZongXunHuan_i++ )
+			for( ZongXunHuan_i = 0; ZongXunHuan_i < SlaveSize; ZongXunHuan_i++ )
 			{
 				FaSong_HuanCun[ 0 ] = 0x00;
 				FaSong_HuanCun[ 1 ] = 0x02;
-				FaSong_HuanCun[ 2 ] = SlaveDeviceSerialNumArr[ ZongXunHuan_i ][ 0 ];
-				FaSong_HuanCun[ 3 ] = SlaveDeviceSerialNumArr[ ZongXunHuan_i ][ 1 ];
-				FaSong_HuanCun[ 4 ] = SlaveDeviceSerialNumArr[ ZongXunHuan_i ][ 2 ];
-				FaSong_HuanCun[ 5 ] = SlaveDeviceSerialNumArr[ ZongXunHuan_i ][ 3 ];
-				FaSong_HuanCun[ 6 ] = SlaveDeviceSerialNumArr[ ZongXunHuan_i ][ 4 ];
+				FaSong_HuanCun[ 2 ] = SlaveArr[ ZongXunHuan_i ].serialArr[0];
+				FaSong_HuanCun[ 3 ] = SlaveArr[ ZongXunHuan_i ].serialArr[1];
+				FaSong_HuanCun[ 4 ] = SlaveArr[ ZongXunHuan_i ].serialArr[2];
+				FaSong_HuanCun[ 5 ] = SlaveArr[ ZongXunHuan_i ].serialArr[3];
+				FaSong_HuanCun[ 6 ] = SlaveArr[ ZongXunHuan_i ].serialArr[4];
 				TonXunFaSong(USART_PC,FaSong_HuanCun,0,7); //返回从机序列号
 			}
             break;
-		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E
-            SlaveDeviceCount = 0;                                                   //清空 ram 历史从机设备数
-            flash_WriteSlaveDeviceCount();                                          //清空 flash 历史从机设备数
+		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E                                          
+            clearSlaveArr();                                                                //清空ram和flash
 			AnWeiSouXun_Flag=0;                                                     //重置发送标志位
 			FenJi_XuLieHao_H1[0]=0;
 			FenJi_XuLieHao_H1[1]=0;
@@ -293,6 +285,7 @@ void Host_reponsePC( void )
 //			TonXunFaSong(USART_PC,FaSong_HuanCun,0,5); 
             break;
 		case 0x08://清除从机序列号 A5 01 08 86 BE
+            clearSlaveArr();                                                                //清空ram和flash
 			FaSong_HuanCun[0]=0xff;
 			FaSong_HuanCun[1]=0xff;
 			FaSong_HuanCun[2]=0x07;
@@ -411,7 +404,9 @@ void Host_responseSlave(void)
             FaSong_HuanCun[5]=GongNeng2_HuanCun[6];
             FaSong_HuanCun[6]=GongNeng2_HuanCun[7];
             FaSong_HuanCun[7]=0x00;
-            SlaveDeviceCount++;
+            SlaveArr[ SlaveSize ].assignArr[ 0 ] = ( SlaveSize + 1 ) / 256;      //从机编号从1开始
+            SlaveArr[ SlaveSize ].assignArr[ 1 ] = ( SlaveSize + 1 ) % 256;
+            SlaveSize++;
             TonXunFaSong(USART_PC,FaSong_HuanCun,0,8);//返回主机一条序列号
 		break;
 	}

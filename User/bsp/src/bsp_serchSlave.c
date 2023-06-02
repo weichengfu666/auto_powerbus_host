@@ -1,151 +1,64 @@
 #include "bsp.h"
 #include "bsp_serchSlave.h"
 
-uint16_t    SlaveDeviceCount;
-uint16_t    DisplayPacketCount;
-uint8_t     DisplayPacketVectorArr[displayPacketVectorArr_len][4];
-uint8_t     SlaveDeviceSerialNumArr[slaveDeviceSerialNumArr_len][5];
 
+uint16_t            SlaveSize;                       //从机总数
+SlaveTypeDef    SlaveArr[ SlaveArrLen ] = {0};
 
-/*
-*********************************************************************************************************
-*	函 数 名: flash_ReadSlaveDeviceSerialNumArr
-*	功能说明: 从CPU 内部Flash读从机序列号。
-*	返 回 值: 0-成功，-1-读失败，-2-没有从机可读
-*********************************************************************************************************
-*/
-int8_t flash_ReadSlaveDeviceSerialNumArr(void)
+//从机总数
+uint16_t readSlaveSize( void )     //读flash --> 到缓存
 {
-    if( ( SlaveDeviceCount = flash_ReadSlaveDeviceCount() ) > 0)//先从flash读从机数到ram的 SlaveDeviceCount，如果大于0，就将从机序列号从flash读到ram的 SlaveDeviceSerialNumArr
-    {
-        if( readFlashStr( slaveDeviceSerialNumArr_addr, ( uint8_t * ) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5 ) == 0 )
-        {
-            return 0;
-        }
-        else
-        {
-            return -1;
-        }
-    }
-    else
-    {
-        return -2;//没有从机可读
-    }
-}
-/*
-*********************************************************************************************************
-*	函 数 名: flash_WriteSlaveDeviceSerialNumArr
-*	功能说明: 写从机序列号到CPU 内部Flash。
-*	返 回 值: 0-成功，-1-写失败，-2-没有从机可写
-*********************************************************************************************************
-*/
-int8_t flash_WriteSlaveDeviceSerialNumArr(void)
-{
-    if( SlaveDeviceCount > 0 )//先从ram的 SlaveDeviceCount 读从机数，如果大于0，就将从机序列号从ram的 SlaveDeviceSerialNumArr 写入flash
-    {
-        flash_WriteSlaveDeviceCount();//写从机数到flash
-        if( writeFlashStr( slaveDeviceSerialNumArr_addr, (uint8_t *) SlaveDeviceSerialNumArr, SlaveDeviceCount * 5) == 0 )
-        {
-            return 0;
-        }
-        else
-        {
-            return -1;
-        }
-    }
-    else
-    {
-        return -2;//没有从机可写
-    }
-}
-/*
-*********************************************************************************************************
-*	函 数 名: flash_WriteSlaveDeviceCount
-*	功能说明: 写从机数到CPU 内部Flash。
-*	返 回 值: 0-成功，-1-写失败
-*********************************************************************************************************
-*/
-int8_t flash_WriteSlaveDeviceCount( void )
-{
-    if( writeFlashStr( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
-    {
-        return 0; 
-    }
-    else
-    {
-        return -1; 
-    }
-}
-/*
-*********************************************************************************************************
-*	函 数 名: flash_ReadSlaveDeviceCount
-*	功能说明: 读取CPU Flash的从机数
-*	返 回 值: 从机数-成功, -1-读失败
-*********************************************************************************************************
-*/
-int16_t flash_ReadSlaveDeviceCount( void )
-{
-    if( readFlashStr( slaveDeviceCount_addr, ( uint8_t * ) &SlaveDeviceCount, sizeof( SlaveDeviceCount ) ) == 0 )
-    {
-        if( SlaveDeviceCount == 0xFFFF)     //flash擦除后的值为0xFFFF
-        {
-            SlaveDeviceCount = 0;
-        }
-        return SlaveDeviceCount;
-    }
-    else
-    {
-        return -1;
-    }
-}
-/*
-*********************************************************************************************************
-*	函 数 名: flash_WriteDisplayPacketCount
-*	功能说明: 写效果包数到CPU 内部Flash。
-*	返 回 值: 0-成功，-1-写失败
-*********************************************************************************************************
-*/
-int8_t flash_WriteDisplayPacketCount( void )
-{
-    if( writeFlashStr( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
-    {
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
-}
-/*
-*********************************************************************************************************
-*	函 数 名: flash_ReadDisplayPacketCount
-*	功能说明: 读取CPU Flash的效果包数
-*	返 回 值: 效果包数-成功，-1-读失败
-*********************************************************************************************************
-*/
-int16_t flash_ReadDisplayPacketCount( void )
-{
-    if(readFlashStr( displayPacketCount_addr, ( uint8_t * ) &DisplayPacketCount, sizeof( DisplayPacketCount ) ) == 0 )
-    {
-        return DisplayPacketCount;
-    }
-    else
-    {
-        return -1;
-    }
+    readFlashStr( slaveSize_addr, (uint8_t*)& SlaveSize,  sizeof( SlaveSize ) ); 
+    return SlaveSize;
 }
 
-/*
-*********************************************************************************************************
-*	函 数 名: flash_Test
-*	功能说明: 测试读写数据到CPU 内部Flash。
-*********************************************************************************************************
-*/
-void flash_Test( void )
+uint16_t writeSlaveSize( void )    //写缓存 --> flash
 {
-    flash_WriteSlaveDeviceCount();           //测试读写从机数到CPU 内部Flash
-    flash_ReadSlaveDeviceCount();
-    
-    flash_WriteDisplayPacketCount();        //测试读写效果包数到CPU 内部Flash
-    flash_ReadDisplayPacketCount();
+    writeFlashStr( slaveSize_addr, (uint8_t*)& SlaveSize,  sizeof( SlaveSize ) ); 
+    return SlaveSize;
+}
+
+uint16_t clearSlaveSize( void )    //清除缓存和flash
+{
+    SlaveSize = 0;
+    writeSlaveSize();
+    readSlaveSize();
+    return SlaveSize;
+}
+
+
+//从机结构体
+uint16_t readSlaveArr( void )      //读flash --> 到缓存
+{
+    uint16_t i;
+    readSlaveSize();       
+    for( i = 0; i < SlaveSize; i++)
+    {
+        readFlashStr( slaveArr_addr + i * sizeof( SlaveTypeDef ), ( uint8_t *)& SlaveArr[i], sizeof( SlaveTypeDef ) );
+    }
+    return SlaveSize;
+}
+
+uint16_t wirteSlaveArr( void )     //写缓存 --> flash
+{
+    uint16_t i;
+    writeSlaveSize();              
+    for( i = 0; i < SlaveSize; i++)
+    {
+        writeFlashStr( slaveArr_addr + i * sizeof( SlaveTypeDef ), ( uint8_t *)& SlaveArr[i], sizeof( SlaveTypeDef ) );
+    }
+    return SlaveSize;
+}
+
+uint16_t clearSlaveArr( void )     //清除缓存和flash
+{
+    uint16_t i;
+    SlaveTypeDef clear_SlaveArr = { 0 };
+    readSlaveSize();
+    for( i = 0; i < SlaveSize; i++)
+    {
+        SlaveArr[i] = clear_SlaveArr;
+        writeFlashStr( slaveArr_addr + i * sizeof( SlaveTypeDef ), ( uint8_t *)& SlaveArr[i], sizeof( SlaveTypeDef ) );
+    }
+    return clearSlaveSize();
 }

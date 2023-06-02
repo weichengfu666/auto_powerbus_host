@@ -9,7 +9,7 @@ void bsp_init(void)
 	NVIC_Init_PeiZhi();
 	USART_InIt_PeiZhi();
 	Host_Init(); 
-    flash_ReadSlaveDeviceSerialNumArr();
+
 }
 
 int main(void)
@@ -19,6 +19,11 @@ int main(void)
 	USART_SendData( USART_PC, 0x61 );
 	USART_SendData( USART_SLAVE, 0x52);
 	USART_SendData( USART_SLAVE, 0x61);
+    
+    USART_SendData( USART_PC, sizeof( SlaveArr ) >> 16 );
+    USART_SendData( USART_PC, sizeof( SlaveArr ) >> 8 );
+    USART_SendData( USART_PC, sizeof( SlaveArr ) );
+    
 
     while (1) 
     {
