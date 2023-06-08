@@ -37,7 +37,7 @@ void USART_InIt_PeiZhi(void)
 	USART_DeInit(USART2); 
 	
 	//	/*配置USART1模式*/
-	USART_InitStructure.USART_BaudRate = 9600;                               	//波特率设置为9600
+	USART_InitStructure.USART_BaudRate = 230400;                               	//波特率设置为9600
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
 	USART_InitStructure.USART_Parity = USART_Parity_No;                       //不设置奇偶校验位	

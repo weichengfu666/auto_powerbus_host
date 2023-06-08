@@ -4,7 +4,8 @@
 u8 GongNeng_HuanCun[2060],GongNeng2_HuanCun[150];       //[0]:功能号，[1 ~ x]:数据
 uint8_t FaSong_HuanCun[2060],FaSong2_HuanCun[150];           
 u16 ZhiLin_ChangDu[256],ZongXunHuan_i=0,ZongXunHuan_j=0,ZhiLin2_ChangDu[256],ZongXunHuan2_i=0,ZongXunHuan2_j=0;
-u16 AnWeiSouXun_Flag=0,AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
+u16 AnWeiSouXun_Flag=0, AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
+u16 CheckSlaveState_Flag = 0, CheckSlaveState_Time = 0, CheckSlaveState_index = 0;
 u8 XuLieHao[5]={0x01,0x02,0x03,0x04,0x05};
 u8 FenJi_XuLieHao_H1[5]={0x00,0x00,0x00,0x00,0x00},FenJi_XuLieHao[10][5],FenJiHaoFuZhi_HuanCun=0;
 //extern uint8_t ChengXu_Data[2048],Flash_ChengXu_Data[2048],Flash_ChengXu_Data2[2048];
@@ -40,6 +41,7 @@ void Host_Init(void)
 	ZhiLin_ChangDu[5]=9;//指令长度初始化
 	ZhiLin_ChangDu[6]=2056;//指令长度初始化
 	ZhiLin_ChangDu[7]=5;//指令长度初始化
+	ZhiLin_ChangDu[8]=5;//指令长度初始化
 	ZhiLin_ChangDu[0xf0-1]=5;//指令长度初始化
 	ZhiLin_ChangDu[254]=5;//指令长度初始化
     ZhiLin_ChangDu[0x20-1]=9;           //LED开关
@@ -49,6 +51,11 @@ void Host_Init(void)
     ZhiLin_ChangDu[0x24-1]=15;         //LED循环闪烁
 	ZhiLin2_ChangDu[0]=4;//指令长度初始化
 	ZhiLin2_ChangDu[1]=11;//指令长度初始化
+    ZhiLin2_ChangDu[0x20-1]=8;//指令长度初始化
+    ZhiLin2_ChangDu[0x21-1]=8;//指令长度初始化
+    ZhiLin2_ChangDu[0x22-1]=13;//指令长度初始化
+    ZhiLin2_ChangDu[0x23-1]=12;//指令长度初始化
+    ZhiLin2_ChangDu[0x24-1]=14;//指令长度初始化
 }
 #endif
 /************************ 总循环 *************************/
@@ -56,6 +63,7 @@ void Host_Init(void)
 void ZongXunHuan(void)
 {
     Host_querySerialNum();  //主机搜索序列号
+    Host_checkSlaveState();//主机检测从机状态
     Host_reponsePC();       //主机应答PC
     Host_responseSlave();   //主机应答从机
 }
@@ -64,9 +72,6 @@ void ZongXunHuan(void)
 *********************************************************************************************************
 *	函 数 名: Host_querySerialNum
 *	功能说明: 主机搜索序列号
-*           将搜索到的从机数存入变量          SlaveDeviceCount
-*           将搜索到的从机序列号存入数组      SlaveDeviceSerialNumArr
-*           然后调用函数存入到flash中         flash_WriteSlaveDeviceSerialNumArr()
 *********************************************************************************************************
 */
 #if 1
@@ -133,6 +138,14 @@ void Host_querySerialNum(void)
                 else //检索未回应的次数超过3次，结束检索
                 {
                     wirteSlaveArr();
+                    //返回检测到的从机数
+                    {
+                        FaSong_HuanCun[ 0 ] = 0x00;//地址
+                        FaSong_HuanCun[ 1 ] = 0x09;//功能帧
+                        FaSong_HuanCun[ 2 ] = SlaveSize / 256;
+                        FaSong_HuanCun[ 3 ] = SlaveSize % 256;
+                        TonXunFaSong( USART_PC, FaSong_HuanCun, 0, 4);  
+                    }
 					FaSong_HuanCun[0]=0;
 					FaSong_HuanCun[1]=0;
 					FaSong_HuanCun[2]=0;
@@ -183,6 +196,89 @@ void Host_querySerialNum(void)
 		}
 	}
 }
+/*
+*********************************************************************************************************
+*	函 数 名: Host_checkSlaveState
+*	功能说明: 主机刷新从机状态信息
+*********************************************************************************************************
+*/
+void Host_checkSlaveState( void )
+{
+    if( CheckSlaveState_Flag > 0 )
+    {
+        if( ( CheckSlaveState_Time < 200 && CheckSlaveState_Flag < 10000 ) || CheckSlaveState_Time > 200 )//未超时返回或超时：处理；未超时未返回：不处理；
+        {
+            if( CheckSlaveState_Time < 200 && CheckSlaveState_Flag < 10000 ) //正确返回（未超时返回）
+            {
+                SlaveArr[ CheckSlaveState_index ].state = 1;      //从机在线
+                //返回电脑检测到的旧从机信息（只返回在线从机）
+                FaSong_HuanCun[ 0 ] = 0x00;
+                FaSong_HuanCun[ 1 ] = 0x02;
+                FaSong_HuanCun[ 2 ] = SlaveArr[ CheckSlaveState_index ].serialArr[0];        //从机序列号：共五字节
+                FaSong_HuanCun[ 3 ] = SlaveArr[ CheckSlaveState_index ].serialArr[1];
+                FaSong_HuanCun[ 4 ] = SlaveArr[ CheckSlaveState_index ].serialArr[2];
+                FaSong_HuanCun[ 5 ] = SlaveArr[ CheckSlaveState_index ].serialArr[3];
+                FaSong_HuanCun[ 6 ] = SlaveArr[ CheckSlaveState_index ].serialArr[4];
+                FaSong_HuanCun[ 7 ] = SlaveArr[ CheckSlaveState_index ].assignArr[0];       //赋值编号高字节
+                FaSong_HuanCun[ 8 ] = SlaveArr[ CheckSlaveState_index ].assignArr[1];       //赋值编号低字节
+
+                TonXunFaSong(USART_PC,FaSong_HuanCun,0,9); //返回电脑：已有从机状态，编号，序列号
+            }
+            else if( CheckSlaveState_Time > 200 )//超时
+            {
+                CheckSlaveState_Flag++;
+                SlaveArr[ CheckSlaveState_index ].state = 0;      //从机离线
+            }
+            if( SlaveArr[ CheckSlaveState_index ].state == 1 || CheckSlaveState_Flag >= 10003 )//从机返回或超过三次未返回，检测下一个旧从机
+            {
+                CheckSlaveState_Flag = 10001;
+                CheckSlaveState_index++;
+            }
+            if( CheckSlaveState_index < SlaveSize )
+            {
+                //开始检测下一个旧从机信息
+                FaSong_HuanCun[0]=0xff;
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x02;
+                FaSong_HuanCun[3]=SlaveArr[ CheckSlaveState_index ].serialArr[0];
+                FaSong_HuanCun[4]=SlaveArr[ CheckSlaveState_index ].serialArr[1];
+                FaSong_HuanCun[5]=SlaveArr[ CheckSlaveState_index ].serialArr[2];
+                FaSong_HuanCun[6]=SlaveArr[ CheckSlaveState_index ].serialArr[3];
+                FaSong_HuanCun[7]=SlaveArr[ CheckSlaveState_index ].serialArr[4];
+                FaSong_HuanCun[8]=SlaveArr[ CheckSlaveState_index ].assignArr[0];      //从机编号从1开始
+                FaSong_HuanCun[9]=SlaveArr[ CheckSlaveState_index ].assignArr[1];
+                TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,10);             //对从机编号赋值              
+                CheckSlaveState_Time = 1;
+            }
+            else
+            {
+                //结束检测旧从机信息
+                CheckSlaveState_Flag = 0;
+                CheckSlaveState_Time = 0;
+                CheckSlaveState_index = 0;
+                //开始按位搜寻新从机信息        
+                AnWeiSouXun_Flag=0;                                                       //重置发送标志位
+                FenJi_XuLieHao_H1[0]=0;
+                FenJi_XuLieHao_H1[1]=0;
+                FenJi_XuLieHao_H1[2]=0;
+                FenJi_XuLieHao_H1[3]=0;
+                FenJi_XuLieHao_H1[4]=0;
+                FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));    //计算即将发送的FenJi_XuLieHao_H1
+                FaSong_HuanCun[0]=0xff;
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x01;
+                FaSong_HuanCun[3]=FenJi_XuLieHao_H1[0];
+                FaSong_HuanCun[4]=FenJi_XuLieHao_H1[1];
+                FaSong_HuanCun[5]=FenJi_XuLieHao_H1[2];
+                FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
+                FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
+                AnWeiSouXun_Flag=10001;                                                 //大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
+                AnWeiSouXun_Time=1;                                                       //时钟开始计时，10ms未收到数据后启动下一次发送
+            }
+        }
+    }
+}
+
 #endif
 /********************** 主机应答PC ***********************/
 #if 1
@@ -190,7 +286,7 @@ void Host_reponsePC( void )
 {
 	switch( GongNeng_HuanCun[ 0 ] )
 	{
-		case 0x01://读取已有从机序列号 A5 01 01 80 7E
+		case 0x01://读取已有从机状态，编号，序列号。电脑发送指令：A5 01 01 80 7E。从机返回数据：
             readSlaveArr();                     //读flash到ram
 			FaSong_HuanCun[ 0 ] = 0x00;//地址
 			FaSong_HuanCun[ 1 ] = 0x01;//功能帧
@@ -200,17 +296,31 @@ void Host_reponsePC( void )
 			for( ZongXunHuan_i = 0; ZongXunHuan_i < SlaveSize; ZongXunHuan_i++ )
 			{
 				FaSong_HuanCun[ 0 ] = 0x00;
-				FaSong_HuanCun[ 1 ] = 0x02;
-				FaSong_HuanCun[ 2 ] = SlaveArr[ ZongXunHuan_i ].serialArr[0];
-				FaSong_HuanCun[ 3 ] = SlaveArr[ ZongXunHuan_i ].serialArr[1];
-				FaSong_HuanCun[ 4 ] = SlaveArr[ ZongXunHuan_i ].serialArr[2];
-				FaSong_HuanCun[ 5 ] = SlaveArr[ ZongXunHuan_i ].serialArr[3];
-				FaSong_HuanCun[ 6 ] = SlaveArr[ ZongXunHuan_i ].serialArr[4];
-				TonXunFaSong(USART_PC,FaSong_HuanCun,0,7); //返回从机序列号
+				FaSong_HuanCun[ 1 ] = 0x01;
+                FaSong_HuanCun[ 2 ] = SlaveArr[ ZongXunHuan_i ].state;                  //在线状态：1在线，0离线
+				FaSong_HuanCun[ 3 ] = SlaveArr[ ZongXunHuan_i ].serialArr[0];        //从机序列号：共五字节
+				FaSong_HuanCun[ 4 ] = SlaveArr[ ZongXunHuan_i ].serialArr[1];
+				FaSong_HuanCun[ 5 ] = SlaveArr[ ZongXunHuan_i ].serialArr[2];
+				FaSong_HuanCun[ 6 ] = SlaveArr[ ZongXunHuan_i ].serialArr[3];
+				FaSong_HuanCun[ 7 ] = SlaveArr[ ZongXunHuan_i ].serialArr[4];
+                FaSong_HuanCun[ 8 ] = SlaveArr[ ZongXunHuan_i ].assignArr[0];       //赋值编号高字节
+				FaSong_HuanCun[ 9 ] = SlaveArr[ ZongXunHuan_i ].assignArr[1];       //赋值编号低字节
+
+				TonXunFaSong(USART_PC,FaSong_HuanCun,0,10); //返回电脑：已有从机状态，编号，序列号
 			}
             break;
-		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E                                          
-            clearSlaveArr();                                                                //清空ram和flash
+		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E                           
+            //主机清除所有从机编号
+            {
+                clearSlaveArr();                                                                //清空ram和flash
+                FaSong_HuanCun[0]=0xff;                                             
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x07;
+                TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,3);
+                CheckSlaveState_Time = 1;
+                while( CheckSlaveState_Time < 500 );
+                CheckSlaveState_Time = 0;
+            }
 			AnWeiSouXun_Flag=0;                                                     //重置发送标志位
 			FenJi_XuLieHao_H1[0]=0;
 			FenJi_XuLieHao_H1[1]=0;
@@ -277,12 +387,6 @@ void Host_reponsePC( void )
 			FaSong_HuanCun[2]=GongNeng_HuanCun[1];
 			FaSong_HuanCun[3]=GongNeng_HuanCun[2];
 			FaSong_HuanCun[4]=GongNeng_HuanCun[3];
-//			for(ZongXunHuan_i=0;ZongXunHuan_i<2048;ZongXunHuan_i++)
-//			{
-////				Flash_ChengXu_Data[ZongXunHuan_i]=GongNeng_HuanCun[ZongXunHuan_i+4];
-//			}
-//			Flash_Write_2K(0x08000000+GongNeng_HuanCun[1]*65536+GongNeng_HuanCun[2]*256+GongNeng_HuanCun[3]);
-//			TonXunFaSong(USART_PC,FaSong_HuanCun,0,5); 
             break;
 		case 0x08://清除从机序列号 A5 01 08 86 BE
             clearSlaveArr();                                                                //清空ram和flash
@@ -292,6 +396,62 @@ void Host_reponsePC( void )
 			TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,3);
 			FaSong_HuanCun[0]=0x07;
 			TonXunFaSong(USART_PC,FaSong_HuanCun,0,1);
+            break;
+		case 0x09://检测从机状态
+            readSlaveArr();                     //读flash到ram
+            //主机清除所有从机编号
+            {
+                FaSong_HuanCun[0]=0xff;                                             
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x07;
+                TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,3);
+                CheckSlaveState_Time = 1;
+                while( CheckSlaveState_Time < 500 );
+            }
+            CheckSlaveState_Flag = 10001;
+            CheckSlaveState_Time = 0;
+            CheckSlaveState_index = 0;
+            //对从机编号赋值
+            if( CheckSlaveState_index < SlaveSize )
+            {
+                FaSong_HuanCun[0]=0xff;
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x02;
+                FaSong_HuanCun[3]=SlaveArr[ CheckSlaveState_index ].serialArr[0];
+                FaSong_HuanCun[4]=SlaveArr[ CheckSlaveState_index ].serialArr[1];
+                FaSong_HuanCun[5]=SlaveArr[ CheckSlaveState_index ].serialArr[2];
+                FaSong_HuanCun[6]=SlaveArr[ CheckSlaveState_index ].serialArr[3];
+                FaSong_HuanCun[7]=SlaveArr[ CheckSlaveState_index ].serialArr[4];
+                FaSong_HuanCun[8]=SlaveArr[ CheckSlaveState_index ].assignArr[0];      //从机编号从1开始
+                FaSong_HuanCun[9]=SlaveArr[ CheckSlaveState_index ].assignArr[1];
+                TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,10);               
+                CheckSlaveState_Time = 1;
+            }
+            else
+            {
+                //结束检测旧从机信息
+                CheckSlaveState_Flag = 0;
+                CheckSlaveState_Time = 0;
+                CheckSlaveState_index = 0;
+                //开始按位搜寻新从机信息        
+                AnWeiSouXun_Flag=0;                                                       //重置发送标志位
+                FenJi_XuLieHao_H1[0]=0;
+                FenJi_XuLieHao_H1[1]=0;
+                FenJi_XuLieHao_H1[2]=0;
+                FenJi_XuLieHao_H1[3]=0;
+                FenJi_XuLieHao_H1[4]=0;
+                FenJi_XuLieHao_H1[AnWeiSouXun_Flag/8]|=(0x80>>(AnWeiSouXun_Flag%8));    //计算即将发送的FenJi_XuLieHao_H1
+                FaSong_HuanCun[0]=0xff;
+                FaSong_HuanCun[1]=0xff;
+                FaSong_HuanCun[2]=0x01;
+                FaSong_HuanCun[3]=FenJi_XuLieHao_H1[0];
+                FaSong_HuanCun[4]=FenJi_XuLieHao_H1[1];
+                FaSong_HuanCun[5]=FenJi_XuLieHao_H1[2];
+                FaSong_HuanCun[6]=FenJi_XuLieHao_H1[3];
+                FaSong_HuanCun[7]=FenJi_XuLieHao_H1[4];
+                AnWeiSouXun_Flag=10001;                                                 //大于10000为未收到分机返回模式,推进一位并进入未收到分机返回模式
+                AnWeiSouXun_Time=1;                                                       //时钟开始计时，10ms未收到数据后启动下一次发送
+            }
             break;
 		case 0xf0:
 			for(ZongXunHuan_i=0;ZongXunHuan_i<4096;ZongXunHuan_i++)
@@ -303,64 +463,59 @@ void Host_reponsePC( void )
 //			Flash_Write_Str(0x080107fd,GongNeng_HuanCun,0,7); 
             break;
 		case 0x20://LED开关
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
             TonXunFaSong(USART2,FaSong_HuanCun,0,5);
-            TonXunFaSong(USART1,FaSong_HuanCun,0,5);
             break;
 		case 0x21://LED亮度设定
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
             TonXunFaSong(USART2,FaSong_HuanCun,0,5);
-            TonXunFaSong(USART1,FaSong_HuanCun,0,5);
             break;
 		case 0x22://LED循环呼吸
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
-            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//呼吸周期H
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//呼吸周期L
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//起始亮度
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//结束亮度
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];//当前亮度
             TonXunFaSong(USART2,FaSong_HuanCun,0,10);
-            TonXunFaSong(USART1,FaSong_HuanCun,0,10);
             break;
 		case 0x23://LED循环（单次）渐变
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//渐变周期H
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//渐变周期L
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//起始亮度
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//结束亮度
             TonXunFaSong(USART2,FaSong_HuanCun,0,9);
-            TonXunFaSong(USART1,FaSong_HuanCun,0,9);
             break;
 		case 0x24://LED循环闪烁
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
-            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
-            FaSong_HuanCun[10]=GongNeng_HuanCun[10];
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//频闪周期1H
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//频闪周期1L
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//频闪周期2H
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//频闪周期2L
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];//起始亮度
+            FaSong_HuanCun[10]=GongNeng_HuanCun[10];//结束亮度 
             TonXunFaSong(USART2,FaSong_HuanCun,0,11);
-            TonXunFaSong(USART1,FaSong_HuanCun,0,11);
             break;
 		case 0xff://查询主机序列号 A5 01 FF 00 FF
 			FaSong_HuanCun[0]=0;
@@ -395,20 +550,93 @@ void Host_responseSlave(void)
 			FaSong_HuanCun[1]=0x01;
 			TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,2);  
 		break;
-		case 2://收到分机号赋值成功返回
-            FaSong_HuanCun[0]=GongNeng2_HuanCun[1];
-            FaSong_HuanCun[1]=GongNeng2_HuanCun[2];
-            FaSong_HuanCun[2]=GongNeng2_HuanCun[3];
-            FaSong_HuanCun[3]=GongNeng2_HuanCun[4];
-            FaSong_HuanCun[4]=GongNeng2_HuanCun[5];
-            FaSong_HuanCun[5]=GongNeng2_HuanCun[6];
-            FaSong_HuanCun[6]=GongNeng2_HuanCun[7];
-            FaSong_HuanCun[7]=0x00;
-            SlaveArr[ SlaveSize ].assignArr[ 0 ] = ( SlaveSize + 1 ) / 256;      //从机编号从1开始
-            SlaveArr[ SlaveSize ].assignArr[ 1 ] = ( SlaveSize + 1 ) % 256;
-            SlaveSize++;
-            TonXunFaSong(USART_PC,FaSong_HuanCun,0,8);//返回主机一条序列号
+		case 2://分机号赋值成功返回
+            if( AnWeiSouXun_Flag > 0 )//按位搜寻从机,
+            {
+                SlaveArr[ SlaveSize ].assignArr[ 0 ] = ( SlaveSize + 1 ) / 256;      //从机编号从1开始
+                SlaveArr[ SlaveSize ].assignArr[ 1 ] = ( SlaveSize + 1) % 256;
+                SlaveArr[ SlaveSize ].state = 1;        
+				FaSong_HuanCun[0] = 0x00;//地址
+				FaSong_HuanCun[1] = 0x02;//功能帧
+                FaSong_HuanCun[2]=SlaveArr[ SlaveSize ].serialArr[ 0 ];//序列号共五字节
+                FaSong_HuanCun[3]=SlaveArr[ SlaveSize ].serialArr[ 1 ];
+                FaSong_HuanCun[4]=SlaveArr[ SlaveSize ].serialArr[ 2 ];
+                FaSong_HuanCun[5]=SlaveArr[ SlaveSize ].serialArr[ 3 ];
+                FaSong_HuanCun[6]=SlaveArr[ SlaveSize ].serialArr[ 4 ];
+                FaSong_HuanCun[7]=SlaveArr[ SlaveSize ].assignArr[ 0 ];//编号H
+                FaSong_HuanCun[8]=SlaveArr[ SlaveSize ].assignArr[ 1 ];//编号L
+                SlaveSize++;
+                TonXunFaSong(USART_PC,FaSong_HuanCun,0,9);//返回电脑一条序列号
+            }
+            if( CheckSlaveState_Flag > 0 )//检测从机状态
+            {
+                if ( CheckSlaveState_Flag > 10000 ) //正确返回
+                {
+                    CheckSlaveState_Time = 1;
+                    CheckSlaveState_Flag-=10000;
+                }
+            }
 		break;
+        case 0x20://LED开关，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
+        break;
+        case 0x21://LED亮度设定，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
+        break;
+        case 0x22://LED循环呼吸，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//呼吸周期H
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//呼吸周期L
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//起始亮度
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//结束亮度
+            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];//当前亮度
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,11);//返回电脑一条确认信息
+        break;
+        case 0x23://LED循环（单次）渐变，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//渐变周期H
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//渐变周期L
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//起始亮度
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//结束亮度
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,10);//返回电脑一条确认信息
+        break;
+        case 0x24://LED循环闪烁，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//频闪周期1H
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//频闪周期1L
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//频闪周期2H
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//频闪周期2L
+            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];//起始亮度
+            FaSong_HuanCun[11]=GongNeng2_HuanCun[10];//结束亮度 
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,12);//返回电脑一条确认信息
+        break;
 	}
 	for(ZongXunHuan2_i=0;ZongXunHuan2_i<150;ZongXunHuan2_i++)
 	{

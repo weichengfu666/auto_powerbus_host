@@ -12,6 +12,7 @@ typedef struct {
 }PackTypeDef;
 
 typedef struct {
+    uint8_t     state;                          //从机状态：1在线，0掉线
     uint8_t     serialArr [ 5 ];              //初始序列号
     uint8_t     assignArr [ 2 ];            //赋值序列号
     uint8_t              packSize;              //效果包数量

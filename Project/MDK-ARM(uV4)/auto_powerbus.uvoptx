@@ -153,27 +153,27 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SlavesSize</ItemText>
+          <ItemText>CheckSlaveState_Flag,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SlavesArr[0]</ItemText>
+          <ItemText>CheckSlaveState_index,0x10</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SlavesArr[1]</ItemText>
+          <ItemText>SlaveSize</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SlavesArr[2]</ItemText>
+          <ItemText>CheckSlaveState_Time,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>SlavesArr[3]</ItemText>
+          <ItemText>GongNeng2_HuanCun</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -202,6 +202,11 @@
           <WinNumber>2</WinNumber>
           <ItemText>SlaveArr[3]</ItemText>
         </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>SlaveArr[4]</ItemText>
+        </Ww>
       </WatchWindow2>
       <MemoryWindow1>
         <Mm>
@@ -217,7 +222,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -509,7 +514,7 @@
 
   <Group>
     <GroupName>Doc</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

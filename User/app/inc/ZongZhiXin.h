@@ -10,8 +10,12 @@
 	
 #define Write_ShuChu1_ReSet GPIO_WriteBit(GPIOC,GPIO_Pin_9,Bit_SET)
 
+extern u16 AnWeiSouXun_Flag, AnWeiSouXun_Time, FenJi_Num, FenJiHuiYin_Flag;
+extern u16 CheckSlaveState_Flag, CheckSlaveState_Time, CheckSlaveState_index;
+
 void Host_Init(void);
 void Host_querySerialNum(void);
+void Host_checkSlaveState( void );
 void ZongXunHuan(void);
 void Host_reponsePC(void);
 void Host_responseSlave(void);

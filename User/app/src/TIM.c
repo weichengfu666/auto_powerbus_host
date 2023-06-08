@@ -35,6 +35,8 @@ void TIM3_IRQHandler(void)
 		Time3++;
 		if(AnWeiSouXun_Time>0)
 			AnWeiSouXun_Time++;
+        if(CheckSlaveState_Time>0)
+            CheckSlaveState_Time++;
 		if(Time3%500==0)
 		{
 			Time_500Ms_Flag=1;
