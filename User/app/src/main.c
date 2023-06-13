@@ -9,7 +9,7 @@ void bsp_init(void)
 	NVIC_Init_PeiZhi();
 	USART_InIt_PeiZhi();
 	Host_Init(); 
-
+    readSlaveArr();
 }
 
 int main(void)

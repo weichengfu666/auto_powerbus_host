@@ -3,7 +3,7 @@
 
 #include "bsp.h"
 
-#define SlaveArrLen 128    
+#define SlaveArrLen 128
 #define packArrLen  16
 
 typedef struct {

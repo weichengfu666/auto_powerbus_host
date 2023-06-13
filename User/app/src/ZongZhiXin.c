@@ -6,6 +6,8 @@ uint8_t FaSong_HuanCun[2060],FaSong2_HuanCun[150];
 u16 ZhiLin_ChangDu[256],ZongXunHuan_i=0,ZongXunHuan_j=0,ZhiLin2_ChangDu[256],ZongXunHuan2_i=0,ZongXunHuan2_j=0;
 u16 AnWeiSouXun_Flag=0, AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
 u16 CheckSlaveState_Flag = 0, CheckSlaveState_Time = 0, CheckSlaveState_index = 0;
+u16 CheckSlaveOnline_PeriodTime = 0, CheckSlaveOnline_PeriodFlag = 0, CheckSlaveOnline_Time = 0, CheckSlaveOnline_Flag = 0, CheckSlaveOnline_index = 0;
+u8 CheckSlaveOnline_recordArr[ 64 ] = {0}, CheckSlaveOnline_bug = 0;
 u8 XuLieHao[5]={0x01,0x02,0x03,0x04,0x05};
 u8 FenJi_XuLieHao_H1[5]={0x00,0x00,0x00,0x00,0x00},FenJi_XuLieHao[10][5],FenJiHaoFuZhi_HuanCun=0;
 //extern uint8_t ChengXu_Data[2048],Flash_ChengXu_Data[2048],Flash_ChengXu_Data2[2048];
@@ -51,6 +53,7 @@ void Host_Init(void)
     ZhiLin_ChangDu[0x24-1]=15;         //LED循环闪烁
 	ZhiLin2_ChangDu[0]=4;//指令长度初始化
 	ZhiLin2_ChangDu[1]=11;//指令长度初始化
+	ZhiLin2_ChangDu[0x0b-1]=6;//指令长度初始化
     ZhiLin2_ChangDu[0x20-1]=8;//指令长度初始化
     ZhiLin2_ChangDu[0x21-1]=8;//指令长度初始化
     ZhiLin2_ChangDu[0x22-1]=13;//指令长度初始化
@@ -64,6 +67,7 @@ void ZongXunHuan(void)
 {
     Host_querySerialNum();  //主机搜索序列号
     Host_checkSlaveState();//主机检测从机状态
+    Host_checkSlaveOnline();//周期检测从机在线状态
     Host_reponsePC();       //主机应答PC
     Host_responseSlave();   //主机应答从机
 }
@@ -137,7 +141,7 @@ void Host_querySerialNum(void)
 				}
                 else //检索未回应的次数超过3次，结束检索
                 {
-                    wirteSlaveArr();
+                    wirteSlaveArr();    //写ram到flash
                     //返回检测到的从机数
                     {
                         FaSong_HuanCun[ 0 ] = 0x00;//地址
@@ -199,11 +203,12 @@ void Host_querySerialNum(void)
 /*
 *********************************************************************************************************
 *	函 数 名: Host_checkSlaveState
-*	功能说明: 主机刷新从机状态信息
+*	功能说明: 检测所有从机状态
 *********************************************************************************************************
 */
 void Host_checkSlaveState( void )
 {
+    //主机检测所有从机状态
     if( CheckSlaveState_Flag > 0 )
     {
         if( ( CheckSlaveState_Time < 200 && CheckSlaveState_Flag < 10000 ) || CheckSlaveState_Time > 200 )//未超时返回或超时：处理；未超时未返回：不处理；
@@ -236,7 +241,7 @@ void Host_checkSlaveState( void )
             }
             if( CheckSlaveState_index < SlaveSize )
             {
-                //开始检测下一个旧从机信息
+                //1、对旧从机编号赋值
                 FaSong_HuanCun[0]=0xff;
                 FaSong_HuanCun[1]=0xff;
                 FaSong_HuanCun[2]=0x02;
@@ -256,7 +261,7 @@ void Host_checkSlaveState( void )
                 CheckSlaveState_Flag = 0;
                 CheckSlaveState_Time = 0;
                 CheckSlaveState_index = 0;
-                //开始按位搜寻新从机信息        
+                //2、开始按位搜寻新从机信息        
                 AnWeiSouXun_Flag=0;                                                       //重置发送标志位
                 FenJi_XuLieHao_H1[0]=0;
                 FenJi_XuLieHao_H1[1]=0;
@@ -278,12 +283,115 @@ void Host_checkSlaveState( void )
         }
     }
 }
+/*
+*********************************************************************************************************
+*	函 数 名: Host_checkSlaveOnline
+*	功能说明: 检测从机在线状态
+*********************************************************************************************************
+*/
+
+//CheckSlaveOnline_Time, CheckSlaveOnline_Flag, CheckSlaveOnline_index;
+void Host_checkSlaveOnline( void )
+{
+    /* 开始检测从机在线状态 */
+    if( CheckSlaveOnline_PeriodFlag == 1 )
+    {
+        CheckSlaveOnline_PeriodFlag = 0;
+        readSlaveArr();                     //读flash到ram
+        //清空从机在线状态记录
+        for( CheckSlaveOnline_index = 0; CheckSlaveOnline_index < 64; CheckSlaveOnline_index++)
+        {
+            CheckSlaveOnline_recordArr[ CheckSlaveOnline_index ] = 0;
+        }
+        CheckSlaveOnline_Flag = 10001;
+        CheckSlaveOnline_Time = 0;
+        CheckSlaveOnline_index = 0;
+        //对从机发送检测在线指令
+        if( CheckSlaveOnline_index < SlaveSize )
+        {
+            FaSong_HuanCun[0]=SlaveArr[ CheckSlaveOnline_index ].assignArr[0];      //赋值编号高字节
+            FaSong_HuanCun[1]=SlaveArr[ CheckSlaveOnline_index ].assignArr[1];      //赋值编号低字节
+            FaSong_HuanCun[2]=0x0b;
+
+            TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,3);               
+            CheckSlaveOnline_Time = 1;
+        }
+        else
+        {
+            //返回电脑检测旧从机在线状态
+            FaSong_HuanCun[ 0 ] = 0x00;//地址
+            FaSong_HuanCun[ 1 ] = 0x0b;//功能帧
+            for( CheckSlaveOnline_index = 0; CheckSlaveOnline_index < 64; CheckSlaveOnline_index++)
+            {
+                FaSong_HuanCun[ CheckSlaveOnline_index + 2 ] = CheckSlaveOnline_recordArr[ CheckSlaveOnline_index ];
+            }
+			TonXunFaSong(USART_PC,FaSong_HuanCun,0, 2 + 64); 
+            //结束检测旧从机在线状态
+            CheckSlaveOnline_Flag = 0;
+            CheckSlaveOnline_Time = 0;
+            CheckSlaveOnline_index = 0;
+            CheckSlaveOnline_PeriodTime = 1;
+        }
+    }
+    /* 检测从机在线状态 */
+	if(CheckSlaveOnline_Flag>0)
+    {
+        if( ( CheckSlaveOnline_Time < 500 && CheckSlaveOnline_Flag < 10000 ) || CheckSlaveOnline_Time > 500 )//未超时返回或超时：处理；未超时未返回：不处理；
+        {
+            if( CheckSlaveOnline_Time < 500 && CheckSlaveOnline_Flag < 10000 ) //正确返回（未超时返回）
+            {
+                SlaveArr[ CheckSlaveOnline_index ].state = 1;      //从机在线
+                CheckSlaveOnline_recordArr[ CheckSlaveOnline_index / 8 ] |= 1 << ( CheckSlaveOnline_index % 8 );     //从机在线记录标志
+            }
+            else if( CheckSlaveOnline_Time > 500 )//超时
+            {
+                CheckSlaveOnline_Flag++;
+                SlaveArr[ CheckSlaveOnline_index ].state = 0;      //从机离线
+            }
+            if( SlaveArr[ CheckSlaveOnline_index ].state == 1 || CheckSlaveOnline_Flag > 10003 )//从机返回或超过三次未返回，检测下一个旧从机
+            {
+                CheckSlaveOnline_Flag = 10001;
+                CheckSlaveOnline_index++;
+            }
+            if( CheckSlaveOnline_index < SlaveSize )
+            {
+                FaSong_HuanCun[0]=SlaveArr[ CheckSlaveOnline_index ].assignArr[0];      //赋值编号高字节
+                FaSong_HuanCun[1]=SlaveArr[ CheckSlaveOnline_index ].assignArr[1];      //赋值编号低字节
+                FaSong_HuanCun[2]=0x0b;
+
+                TonXunFaSong(USART_SLAVE,FaSong_HuanCun,0,3);               
+                CheckSlaveOnline_Time = 1;
+            }
+            else
+            {
+                //返回电脑检测旧从机在线状态
+                FaSong_HuanCun[ 0 ] = 0x00;//地址
+                FaSong_HuanCun[ 1 ] = 0x0b;//功能帧
+                for( CheckSlaveOnline_index = 0; CheckSlaveOnline_index < 64; CheckSlaveOnline_index++)
+                {
+                    FaSong_HuanCun[ CheckSlaveOnline_index + 2 ] = CheckSlaveOnline_recordArr[ CheckSlaveOnline_index ];
+                }
+                TonXunFaSong(USART_PC,FaSong_HuanCun,0, 2 + 64); 
+                //结束检测旧从机在线状态
+                CheckSlaveOnline_Flag = 0;
+                CheckSlaveOnline_Time = 0;
+                CheckSlaveOnline_index = 0;
+                CheckSlaveOnline_PeriodTime = 1;
+            }
+        }
+    }
+}
+    
 
 #endif
 /********************** 主机应答PC ***********************/
 #if 1
 void Host_reponsePC( void )
 {
+//    if( GongNeng_HuanCun[ 0 ] != 0) //停止周期刷新从机状态信息，优先处理电脑指令
+//    {
+//        CheckSlaveState_PeriodTime = 1, CheckSlaveState_PeriodFlag = 0;
+//    }
 	switch( GongNeng_HuanCun[ 0 ] )
 	{
 		case 0x01://读取已有从机状态，编号，序列号。电脑发送指令：A5 01 01 80 7E。从机返回数据：
@@ -397,7 +505,7 @@ void Host_reponsePC( void )
 			FaSong_HuanCun[0]=0x07;
 			TonXunFaSong(USART_PC,FaSong_HuanCun,0,1);
             break;
-		case 0x09://检测从机状态
+		case 0x09://检测所有从机状态
             readSlaveArr();                     //读flash到ram
             //主机清除所有从机编号
             {
@@ -543,6 +651,8 @@ void Host_reponsePC( void )
 #if 1
 void Host_responseSlave(void)
 {
+
+    CheckSlaveOnline_bug = GongNeng2_HuanCun[0];
     switch(GongNeng2_HuanCun[0])
 	{
 		case 1://按位搜寻模块序列号
@@ -568,12 +678,22 @@ void Host_responseSlave(void)
                 SlaveSize++;
                 TonXunFaSong(USART_PC,FaSong_HuanCun,0,9);//返回电脑一条序列号
             }
-            if( CheckSlaveState_Flag > 0 )//检测从机状态
+            if( CheckSlaveState_Flag > 0 )//检测所有从机状态
             {
                 if ( CheckSlaveState_Flag > 10000 ) //正确返回
                 {
                     CheckSlaveState_Time = 1;
                     CheckSlaveState_Flag-=10000;
+                }
+            }
+		break;
+		case 0x0b://检测从机在线状态
+            if( CheckSlaveOnline_Flag > 0 )//检测从机在线状态
+            {
+                if ( CheckSlaveOnline_Flag > 10000 ) //正确返回
+                {
+                    CheckSlaveOnline_Time = 1;
+                    CheckSlaveOnline_Flag-=10000;
                 }
             }
 		break;

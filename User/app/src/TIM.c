@@ -37,6 +37,10 @@ void TIM3_IRQHandler(void)
 			AnWeiSouXun_Time++;
         if(CheckSlaveState_Time>0)
             CheckSlaveState_Time++;
+        if(CheckSlaveOnline_Time>0)
+            CheckSlaveOnline_Time++;
+        if(CheckSlaveOnline_PeriodTime>0)
+            CheckSlaveOnline_PeriodTime++;
 		if(Time3%500==0)
 		{
 			Time_500Ms_Flag=1;
@@ -44,6 +48,11 @@ void TIM3_IRQHandler(void)
 		if(Time3>360000000)
 		{
 			Time3=0;
+		}
+		if(CheckSlaveOnline_PeriodTime>10000)  //大概每10秒刷新一次：因为开始刷新时，要关闭定时器，要等刷新完后，再开启定时10秒。
+		{
+			CheckSlaveOnline_PeriodTime=0;//关闭检测从机在线状态的定时器
+            CheckSlaveOnline_PeriodFlag = 1;//开始检测从机在线状态
 		}
 	}
 	TIM_ClearITPendingBit(TIM3,TIM_FLAG_Update);			        //清除中断标志位
