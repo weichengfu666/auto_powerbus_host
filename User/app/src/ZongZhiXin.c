@@ -34,31 +34,45 @@ void Host_Init(void)
 	{
 		ZhiLin2_ChangDu[ZhuJi_Init_i]=0;
 	}
-
-	ZhiLin_ChangDu[0]=5;//指令长度初始化
-	ZhiLin_ChangDu[1]=5;//指令长度初始化
-	ZhiLin_ChangDu[2]=9;//指令长度初始化
-	ZhiLin_ChangDu[3]=7;//指令长度初始化
-	ZhiLin_ChangDu[4]=7;//指令长度初始化
-	ZhiLin_ChangDu[5]=9;//指令长度初始化
-	ZhiLin_ChangDu[6]=2056;//指令长度初始化
-	ZhiLin_ChangDu[7]=5;//指令长度初始化
-	ZhiLin_ChangDu[8]=5;//指令长度初始化
-	ZhiLin_ChangDu[0xf0-1]=5;//指令长度初始化
-	ZhiLin_ChangDu[254]=5;//指令长度初始化
-    ZhiLin_ChangDu[0x20-1]=9;           //LED开关
-    ZhiLin_ChangDu[0x21-1]=9;           //LED亮度设定
-    ZhiLin_ChangDu[0x22-1]=14;         //LED循环呼吸
-    ZhiLin_ChangDu[0x23-1]=13;         //LED循环（单次）渐变
-    ZhiLin_ChangDu[0x24-1]=15;         //LED循环闪烁
+//电脑-主机指令长度初始化
+	ZhiLin_ChangDu[0x01-1]=5;//读取已有从机状态，编号，序列号
+	ZhiLin_ChangDu[0x02-1]=5;//按位搜寻从机序列号
+	ZhiLin_ChangDu[0x03-1]=9;//设备控制
+	ZhiLin_ChangDu[0x04-1]=7;//触发控制
+	ZhiLin_ChangDu[0x05-1]=7;//联动效果执行
+	ZhiLin_ChangDu[0x06-1]=9;//音效控制
+	ZhiLin_ChangDu[0x07-1]=2056;//程序接收
+	ZhiLin_ChangDu[0x08-1]=5;//清除从机序列号
+	ZhiLin_ChangDu[0x09-1]=5;//检测所有从机状态
+	ZhiLin_ChangDu[0xff-1]=5;//查询主机序列号
+    
+    ZhiLin_ChangDu[0x20-1]=9;//LED通电
+    ZhiLin_ChangDu[0x21-1]=9;//LED断电
+    ZhiLin_ChangDu[0x22-1]=10;//LED亮度设定
+    ZhiLin_ChangDu[0x23-1]=14;//LED单次渐变
+    ZhiLin_ChangDu[0x24-1]=17;//LED循环呼吸
+    ZhiLin_ChangDu[0x25-1]=17;//LED循环闪烁
+    
+    ZhiLin_ChangDu[0x30-1]=9;//LOCK通电
+    ZhiLin_ChangDu[0x31-1]=9;//LOCK断电
+    ZhiLin_ChangDu[0x32-1]=12;//LOCK断后通
+    ZhiLin_ChangDu[0x33-1]=12;//LOCK通后断
+//主机-从机指令长度初始化
 	ZhiLin2_ChangDu[0]=4;//指令长度初始化
 	ZhiLin2_ChangDu[1]=11;//指令长度初始化
 	ZhiLin2_ChangDu[0x0b-1]=6;//指令长度初始化
-    ZhiLin2_ChangDu[0x20-1]=8;//指令长度初始化
-    ZhiLin2_ChangDu[0x21-1]=8;//指令长度初始化
-    ZhiLin2_ChangDu[0x22-1]=13;//指令长度初始化
-    ZhiLin2_ChangDu[0x23-1]=12;//指令长度初始化
-    ZhiLin2_ChangDu[0x24-1]=14;//指令长度初始化
+    
+    ZhiLin2_ChangDu[0x20-1]=8;//LED通电
+    ZhiLin2_ChangDu[0x21-1]=8;//LED断电
+    ZhiLin2_ChangDu[0x22-1]=9;//LED亮度设定
+    ZhiLin2_ChangDu[0x23-1]=13;//LED单次渐变
+    ZhiLin2_ChangDu[0x24-1]=16;//LED循环呼吸
+    ZhiLin2_ChangDu[0x25-1]=16;//LED循环闪烁
+    
+    ZhiLin2_ChangDu[0x30-1]=8;//LOCK通电
+    ZhiLin2_ChangDu[0x31-1]=8;//LOCK断电
+    ZhiLin2_ChangDu[0x32-1]=11;//LOCK断后通
+    ZhiLin2_ChangDu[0x33-1]=11;//LOCK通后断
 }
 #endif
 /************************ 总循环 *************************/
@@ -388,12 +402,9 @@ void Host_checkSlaveOnline( void )
 #if 1
 void Host_reponsePC( void )
 {
-//    if( GongNeng_HuanCun[ 0 ] != 0) //停止周期刷新从机状态信息，优先处理电脑指令
-//    {
-//        CheckSlaveState_PeriodTime = 1, CheckSlaveState_PeriodFlag = 0;
-//    }
 	switch( GongNeng_HuanCun[ 0 ] )
 	{
+/*通用控制*/
 		case 0x01://读取已有从机状态，编号，序列号。电脑发送指令：A5 01 01 80 7E。从机返回数据：
             readSlaveArr();                     //读flash到ram
 			FaSong_HuanCun[ 0 ] = 0x00;//地址
@@ -561,70 +572,6 @@ void Host_reponsePC( void )
                 AnWeiSouXun_Time=1;                                                       //时钟开始计时，10ms未收到数据后启动下一次发送
             }
             break;
-		case 0xf0:
-			for(ZongXunHuan_i=0;ZongXunHuan_i<4096;ZongXunHuan_i++)
-			{
-//				USART_SendData(USART_PC,ChengXu_Data[ZongXunHuan_i]);
-			}
-            break;
-		case 0x64:
-//			Flash_Write_Str(0x080107fd,GongNeng_HuanCun,0,7); 
-            break;
-		case 0x20://LED开关
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
-            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
-            break;
-		case 0x21://LED亮度设定
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
-            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
-            break;
-		case 0x22://LED循环呼吸
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//呼吸周期H
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//呼吸周期L
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//起始亮度
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//结束亮度
-            FaSong_HuanCun[9]=GongNeng_HuanCun[9];//当前亮度
-            TonXunFaSong(USART2,FaSong_HuanCun,0,10);
-            break;
-		case 0x23://LED循环（单次）渐变
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//渐变周期H
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//渐变周期L
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//起始亮度
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//结束亮度
-            TonXunFaSong(USART2,FaSong_HuanCun,0,9);
-            break;
-		case 0x24://LED循环闪烁
-            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
-			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
-            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
-            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
-            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//输出类型
-            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//频闪周期1H
-            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//频闪周期1L
-            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//频闪周期2H
-            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//频闪周期2L
-            FaSong_HuanCun[9]=GongNeng_HuanCun[9];//起始亮度
-            FaSong_HuanCun[10]=GongNeng_HuanCun[10];//结束亮度 
-            TonXunFaSong(USART2,FaSong_HuanCun,0,11);
-            break;
 		case 0xff://查询主机序列号 A5 01 FF 00 FF
 			FaSong_HuanCun[0]=0;
 			FaSong_HuanCun[1]=0xff;
@@ -634,6 +581,116 @@ void Host_reponsePC( void )
 			FaSong_HuanCun[5]=XuLieHao[3];
 			FaSong_HuanCun[6]=XuLieHao[4];
 			TonXunFaSong(USART_PC,FaSong_HuanCun,0,7); 
+            break;
+/*LED模块控制*/
+		case 0x20://LED通电
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            break;
+		case 0x21://LED断电
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            break;
+		case 0x22://LED亮度设定
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//LED亮度值
+            TonXunFaSong(USART2,FaSong_HuanCun,0,6);
+            break;
+		case 0x23://LED单次渐变
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//LED初始亮度值
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//LED渐变时间
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];//LED结束亮度值
+            TonXunFaSong(USART2,FaSong_HuanCun,0,10);
+            break;
+		case 0x24://LED循环呼吸
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//LED最高亮度值
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];//LED最低亮度值
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];//LED呼吸周期
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
+            FaSong_HuanCun[10]=GongNeng_HuanCun[10];//LED起始时间
+            FaSong_HuanCun[11]=GongNeng_HuanCun[11];
+            FaSong_HuanCun[12]=GongNeng_HuanCun[12];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,13);
+            break;
+		case 0x25://LED循环闪烁
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//LED亮时间
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            FaSong_HuanCun[8]=GongNeng_HuanCun[8];//LED灭时间
+            FaSong_HuanCun[9]=GongNeng_HuanCun[9];
+            FaSong_HuanCun[10]=GongNeng_HuanCun[10];
+            FaSong_HuanCun[11]=GongNeng_HuanCun[11];//LED最高亮度
+            FaSong_HuanCun[12]=GongNeng_HuanCun[12];//LED最低亮度
+            TonXunFaSong(USART2,FaSong_HuanCun,0,13);
+            break;
+/*电磁锁模块控制*/
+		case 0x30://电磁锁通电
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LOCK执行状态
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            break;
+		case 0x31://电磁锁断电
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LOCK执行状态
+            TonXunFaSong(USART2,FaSong_HuanCun,0,5);
+            break;
+		case 0x32://电磁锁断后通
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LOCK执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//延时时间
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,8);
+            break;
+		case 0x33://电磁锁通后断
+            FaSong_HuanCun[0]=GongNeng_HuanCun[1];//编号H
+			FaSong_HuanCun[1]=GongNeng_HuanCun[2];//编号L
+            FaSong_HuanCun[2]=GongNeng_HuanCun[0];//功能帧
+            FaSong_HuanCun[3]=GongNeng_HuanCun[3];//输出端口
+            FaSong_HuanCun[4]=GongNeng_HuanCun[4];//LOCK执行状态
+            FaSong_HuanCun[5]=GongNeng_HuanCun[5];//延时时间
+            FaSong_HuanCun[6]=GongNeng_HuanCun[6];
+            FaSong_HuanCun[7]=GongNeng_HuanCun[7];
+            TonXunFaSong(USART2,FaSong_HuanCun,0,8);
             break;
 	}
 	for(ZongXunHuan_i=0;ZongXunHuan_i<2060;ZongXunHuan_i++)
@@ -697,66 +754,124 @@ void Host_responseSlave(void)
                 }
             }
 		break;
-        case 0x20://LED开关，返回电脑
+        case 0x20://LED通电 ，返回电脑
             FaSong_HuanCun[0] = 0x00;//地址
             FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
             FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
             FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
             FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
-            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
             TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
         break;
-        case 0x21://LED亮度设定，返回电脑
+        case 0x21://LED断电 ，返回电脑
             FaSong_HuanCun[0] = 0x00;//地址
             FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
             FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
             FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
             FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
-            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
             TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
         break;
-        case 0x22://LED循环呼吸，返回电脑
+        case 0x22://LED亮度设定 ，返回电脑
             FaSong_HuanCun[0] = 0x00;//地址
             FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
             FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
             FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
             FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
-            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
-            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//呼吸周期H
-            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//呼吸周期L
-            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//起始亮度
-            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//结束亮度
-            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];//当前亮度
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//LED亮度值
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,7);//返回电脑一条确认信息
+        break;
+        case 0x23://LED单次渐变 ，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//LED初始亮度值
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//LED渐变时间
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];
+            FaSong_HuanCun[10]=  GongNeng2_HuanCun[9];//LED结束亮度值
             TonXunFaSong(USART_PC,FaSong_HuanCun,0,11);//返回电脑一条确认信息
         break;
-        case 0x23://LED循环（单次）渐变，返回电脑
+        case 0x24://LED循环呼吸 ，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//LED最高亮度值
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//LED最低亮度值
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//LED呼吸周期
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];
+            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];
+            FaSong_HuanCun[11]=GongNeng2_HuanCun[10];//LED起始时间
+            FaSong_HuanCun[12]=GongNeng2_HuanCun[11];
+            FaSong_HuanCun[13]=GongNeng2_HuanCun[12];
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,14);//返回电脑一条确认信息
+        break;
+        case 0x25://LED循环闪烁 ，返回电脑
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//LED执行状态
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//LED亮时间
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];
+            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//LED灭时间
+            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];
+            FaSong_HuanCun[11]=GongNeng2_HuanCun[10];
+            FaSong_HuanCun[12]=GongNeng2_HuanCun[11];//LED最高亮度
+            FaSong_HuanCun[13]=GongNeng2_HuanCun[12];//LED最低亮度
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,14);//返回电脑一条确认信息
+        break;
+		case 0x30://电磁锁通电
             FaSong_HuanCun[0] = 0x00;//地址
             FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
             FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
             FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
             FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
             FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
-            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//渐变周期H
-            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//渐变周期L
-            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//起始亮度
-            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//结束亮度
-            TonXunFaSong(USART_PC,FaSong_HuanCun,0,10);//返回电脑一条确认信息
-        break;
-        case 0x24://LED循环闪烁，返回电脑
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
+            break;
+		case 0x31://电磁锁断电
             FaSong_HuanCun[0] = 0x00;//地址
             FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
             FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
             FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
             FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
             FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
-            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//频闪周期1H
-            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//频闪周期1L
-            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//频闪周期2H
-            FaSong_HuanCun[9]=  GongNeng2_HuanCun[8];//频闪周期2L
-            FaSong_HuanCun[10]=GongNeng2_HuanCun[9];//起始亮度
-            FaSong_HuanCun[11]=GongNeng2_HuanCun[10];//结束亮度 
-            TonXunFaSong(USART_PC,FaSong_HuanCun,0,12);//返回电脑一条确认信息
-        break;
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,6);//返回电脑一条确认信息
+            break;
+		case 0x32://电磁锁断后通
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//延时时间1
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//延时时间2
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//延时时间3
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,9);//返回电脑一条确认信息
+            break;
+		case 0x33://电磁锁通后断
+            FaSong_HuanCun[0] = 0x00;//地址
+            FaSong_HuanCun[1] = GongNeng2_HuanCun[0];//功能帧
+            FaSong_HuanCun[2]=  GongNeng2_HuanCun[1];//编号H
+            FaSong_HuanCun[3]=  GongNeng2_HuanCun[2];//编号L  
+            FaSong_HuanCun[4]=  GongNeng2_HuanCun[3];//输出端口
+            FaSong_HuanCun[5]=  GongNeng2_HuanCun[4];//输出类型
+            FaSong_HuanCun[6]=  GongNeng2_HuanCun[5];//延时时间1
+            FaSong_HuanCun[7]=  GongNeng2_HuanCun[6];//延时时间2
+            FaSong_HuanCun[8]=  GongNeng2_HuanCun[7];//延时时间3
+            TonXunFaSong(USART_PC,FaSong_HuanCun,0,9);//返回电脑一条确认信息
+            break;
 	}
 	for(ZongXunHuan2_i=0;ZongXunHuan2_i<150;ZongXunHuan2_i++)
 	{
