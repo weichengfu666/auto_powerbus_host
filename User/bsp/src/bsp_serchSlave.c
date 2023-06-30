@@ -2,10 +2,25 @@
 #include "bsp_serchSlave.h"
 
 
-uint16_t            SlaveSize;                       //从机总数
-SlaveTypeDef    SlaveArr[ SlaveArrLen ] = {0};
+uint16_t            SlaveSize;                                                    //从机总数，0x02 字节
+SlaveTypeDef    SlaveArr[ SlaveArrLen ] = {0};                       //511个从机结构体
+uint16_t            PackSize;                                                    //效果数，0x02 字节
+uint8_t              NodeSize;                                                   //节点数，0x01字节
+uint8_t              NodeAddrArr[ NodeAddrArrLen ][ 3 ];         //170个触发节点地址
 
-//从机总数
+
+uint16_t readPackSize( void )       //读flash --> 到缓存
+{
+    readFlashStr( packSize_addr, (uint8_t*)& PackSize,  sizeof( PackSize ) ); 
+    return PackSize; 
+}
+
+uint8_t readNodeSize( void )       //读flash --> 到缓存
+{
+    readFlashStr( nodeSize_addr, (uint8_t*)& NodeSize,  sizeof( NodeSize ) );
+    return NodeSize;
+}
+
 uint16_t readSlaveSize( void )     //读flash --> 到缓存
 {
     readFlashStr( slaveSize_addr, (uint8_t*)& SlaveSize,  sizeof( SlaveSize ) ); 
@@ -25,7 +40,6 @@ uint16_t clearSlaveSize( void )    //清除缓存和flash
     readSlaveSize();
     return SlaveSize;
 }
-
 
 //从机结构体
 uint16_t readSlaveArr( void )      //读flash --> 到缓存
@@ -62,3 +76,4 @@ uint16_t clearSlaveArr( void )     //清除缓存和flash
     }
     return clearSlaveSize();
 }
+

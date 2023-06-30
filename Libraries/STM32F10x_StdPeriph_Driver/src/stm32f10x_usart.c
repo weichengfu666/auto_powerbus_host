@@ -22,7 +22,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_usart.h"
 #include "stm32f10x_rcc.h"
-extern uchar ZhongDuan_TX_Flag[4];
+extern uchar ZhongDuan_TX_Flag[5];
 /** @addtogroup STM32F10x_StdPeriph_Driver
   * @{
   */
@@ -611,6 +611,16 @@ void USART_SendData(USART_TypeDef* USARTx, uint16_t Data)
 	{
 		while(!ZhongDuan_TX_Flag[2]);
 		ZhongDuan_TX_Flag[2]=0;
+	}
+	if(USARTx==UART4)
+	{
+		while(!ZhongDuan_TX_Flag[3]);
+		ZhongDuan_TX_Flag[3]=0;
+	}
+	if(USARTx==UART5)
+	{
+		while(!ZhongDuan_TX_Flag[4]);
+		ZhongDuan_TX_Flag[4]=0;
 	}
 }
 

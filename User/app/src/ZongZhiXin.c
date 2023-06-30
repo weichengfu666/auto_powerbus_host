@@ -6,7 +6,7 @@ uint8_t FaSong_HuanCun[2060],FaSong2_HuanCun[150];
 u16 ZhiLin_ChangDu[256],ZongXunHuan_i=0,ZongXunHuan_j=0,ZhiLin2_ChangDu[256],ZongXunHuan2_i=0,ZongXunHuan2_j=0;
 u16 AnWeiSouXun_Flag=0, AnWeiSouXun_Time=0,FenJi_Num=0,FenJiHuiYin_Flag=0;
 u16 CheckSlaveState_Flag = 0, CheckSlaveState_Time = 0, CheckSlaveState_index = 0;
-u16 CheckSlaveOnline_PeriodTime = 0, CheckSlaveOnline_PeriodFlag = 0, CheckSlaveOnline_Time = 0, CheckSlaveOnline_Flag = 0, CheckSlaveOnline_index = 0;
+u16 CheckSlaveOnline_PeriodTime = 0, CheckSlaveOnline_PeriodFlag = 0, CheckSlaveOnline_Time = 0, CheckSlaveOnline_Flag = 0, CheckSlaveOnline_index = 0, Slave_state = 0;
 u8 CheckSlaveOnline_recordArr[ 64 ] = {0}, CheckSlaveOnline_bug = 0;
 u8 XuLieHao[5]={0x01,0x02,0x03,0x04,0x05};
 u8 FenJi_XuLieHao_H1[5]={0x00,0x00,0x00,0x00,0x00},FenJi_XuLieHao[10][5],FenJiHaoFuZhi_HuanCun=0;
@@ -229,7 +229,7 @@ void Host_checkSlaveState( void )
         {
             if( CheckSlaveState_Time < 200 && CheckSlaveState_Flag < 10000 ) //正确返回（未超时返回）
             {
-                SlaveArr[ CheckSlaveState_index ].state = 1;      //从机在线
+                Slave_state = 1;      //从机在线
                 //返回电脑检测到的旧从机信息（只返回在线从机）
                 FaSong_HuanCun[ 0 ] = 0x00;
                 FaSong_HuanCun[ 1 ] = 0x02;
@@ -246,9 +246,9 @@ void Host_checkSlaveState( void )
             else if( CheckSlaveState_Time > 200 )//超时
             {
                 CheckSlaveState_Flag++;
-                SlaveArr[ CheckSlaveState_index ].state = 0;      //从机离线
+                Slave_state = 0;      //从机离线
             }
-            if( SlaveArr[ CheckSlaveState_index ].state == 1 || CheckSlaveState_Flag >= 10003 )//从机返回或超过三次未返回，检测下一个旧从机
+            if( Slave_state == 1 || CheckSlaveState_Flag >= 10003 )//从机返回或超过三次未返回，检测下一个旧从机
             {
                 CheckSlaveState_Flag = 10001;
                 CheckSlaveState_index++;
@@ -354,15 +354,15 @@ void Host_checkSlaveOnline( void )
         {
             if( CheckSlaveOnline_Time < 500 && CheckSlaveOnline_Flag < 10000 ) //正确返回（未超时返回）
             {
-                SlaveArr[ CheckSlaveOnline_index ].state = 1;      //从机在线
+                Slave_state = 1;      //从机在线
                 CheckSlaveOnline_recordArr[ CheckSlaveOnline_index / 8 ] |= 1 << ( CheckSlaveOnline_index % 8 );     //从机在线记录标志
             }
             else if( CheckSlaveOnline_Time > 500 )//超时
             {
                 CheckSlaveOnline_Flag++;
-                SlaveArr[ CheckSlaveOnline_index ].state = 0;      //从机离线
+                Slave_state = 0;      //从机离线
             }
-            if( SlaveArr[ CheckSlaveOnline_index ].state == 1 || CheckSlaveOnline_Flag > 10003 )//从机返回或超过三次未返回，检测下一个旧从机
+            if( Slave_state == 1 || CheckSlaveOnline_Flag > 10003 )//从机返回或超过三次未返回，检测下一个旧从机
             {
                 CheckSlaveOnline_Flag = 10001;
                 CheckSlaveOnline_index++;
@@ -416,16 +416,15 @@ void Host_reponsePC( void )
 			{
 				FaSong_HuanCun[ 0 ] = 0x00;
 				FaSong_HuanCun[ 1 ] = 0x01;
-                FaSong_HuanCun[ 2 ] = SlaveArr[ ZongXunHuan_i ].state;                  //在线状态：1在线，0离线
-				FaSong_HuanCun[ 3 ] = SlaveArr[ ZongXunHuan_i ].serialArr[0];        //从机序列号：共五字节
-				FaSong_HuanCun[ 4 ] = SlaveArr[ ZongXunHuan_i ].serialArr[1];
-				FaSong_HuanCun[ 5 ] = SlaveArr[ ZongXunHuan_i ].serialArr[2];
-				FaSong_HuanCun[ 6 ] = SlaveArr[ ZongXunHuan_i ].serialArr[3];
-				FaSong_HuanCun[ 7 ] = SlaveArr[ ZongXunHuan_i ].serialArr[4];
-                FaSong_HuanCun[ 8 ] = SlaveArr[ ZongXunHuan_i ].assignArr[0];       //赋值编号高字节
-				FaSong_HuanCun[ 9 ] = SlaveArr[ ZongXunHuan_i ].assignArr[1];       //赋值编号低字节
+				FaSong_HuanCun[ 2 ] = SlaveArr[ ZongXunHuan_i ].serialArr[0];        //从机序列号：共五字节
+				FaSong_HuanCun[ 3 ] = SlaveArr[ ZongXunHuan_i ].serialArr[1];
+				FaSong_HuanCun[ 4 ] = SlaveArr[ ZongXunHuan_i ].serialArr[2];
+				FaSong_HuanCun[ 5 ] = SlaveArr[ ZongXunHuan_i ].serialArr[3];
+				FaSong_HuanCun[ 6 ] = SlaveArr[ ZongXunHuan_i ].serialArr[4];
+                FaSong_HuanCun[ 7 ] = SlaveArr[ ZongXunHuan_i ].assignArr[0];       //赋值编号高字节
+				FaSong_HuanCun[ 8 ] = SlaveArr[ ZongXunHuan_i ].assignArr[1];       //赋值编号低字节
 
-				TonXunFaSong(USART_PC,FaSong_HuanCun,0,10); //返回电脑：已有从机状态，编号，序列号
+				TonXunFaSong(USART_PC,FaSong_HuanCun,0,9); //返回电脑：已有从机状态，编号，序列号
 			}
             break;
 		case 0x02://按位搜寻从机序列号 A5 01 02 81 3E                           
@@ -721,8 +720,7 @@ void Host_responseSlave(void)
             if( AnWeiSouXun_Flag > 0 )//按位搜寻从机,
             {
                 SlaveArr[ SlaveSize ].assignArr[ 0 ] = ( SlaveSize + 1 ) / 256;      //从机编号从1开始
-                SlaveArr[ SlaveSize ].assignArr[ 1 ] = ( SlaveSize + 1) % 256;
-                SlaveArr[ SlaveSize ].state = 1;        
+                SlaveArr[ SlaveSize ].assignArr[ 1 ] = ( SlaveSize + 1) % 256;  
 				FaSong_HuanCun[0] = 0x00;//地址
 				FaSong_HuanCun[1] = 0x02;//功能帧
                 FaSong_HuanCun[2]=SlaveArr[ SlaveSize ].serialArr[ 0 ];//序列号共五字节

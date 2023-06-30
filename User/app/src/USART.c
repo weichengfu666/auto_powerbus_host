@@ -7,7 +7,7 @@ u16 PC_RxHuanCun_i[5], Slave_RxHuanCun_i[5];                //电脑和从机的数据缓
 u8  CRC_HuanCun[2060];                                      //CRC校验数据缓存
 u16 PC_ProcessRecvData_i = 0, PC_ProcessRecvData_j = 0;     
 u16 Slave_ProcessRecvData_i = 0,Slave_ProcessRecvData_j = 0;
-u8  ZhongDuan_TX_Flag[4];
+u8  ZhongDuan_TX_Flag[5];
 extern u16 AnWeiSouXun_Flag;
 extern u16 AnWeiSouXun_Time;
 extern u8 FenJi_XuLieHao_H1[5];
@@ -20,6 +20,7 @@ extern u16 ZhiLin_ChangDu[256], ZhiLin2_ChangDu[256];
 void USART_InIt_PeiZhi(void)
 {		
 	u8 USART_InIt_i,USART_InIt_j;
+	GPIO_InitTypeDef GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
     
 	for(USART_InIt_i=0;USART_InIt_i<5;USART_InIt_i++)
@@ -29,14 +30,59 @@ void USART_InIt_PeiZhi(void)
 			PC_RxHuanCun[USART_InIt_i][USART_InIt_j]=0;
 		}
 	}
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_AFIO|RCC_APB2Periph_USART1 ,ENABLE);	//使能usart1时钟			
-	RCC_APB2PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);																					//使能usart2时钟	
+  
+	/*配置USART1引脚*/
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);//使能UART1的GPIO的时钟		UART1   TX_PA9, RX_PA10	
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);//使能UART1的外设的时钟	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;// 将USART1 Tx的GPIO配置为推挽复用模式
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;// 将USART1 Rx的GPIO配置为浮空输入模式
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	/*配置USART2引脚*/
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);//使能UART2的GPIO的时钟      UART2    TX_PA2, RX_PA3
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2,ENABLE);//使能UART2的外设的时钟
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;// 将USART2 Tx的GPIO配置为推挽复用模式
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;// 将USART2 Rx的GPIO配置为浮空输入模式
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+//    /*配置USART3引脚*/
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);//使能UART3的GPIO的时钟      UART3    TX_PB10, RX_PB11
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);//使能UART3的外设的时钟
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;// 将USART3 Tx的GPIO配置为推挽复用模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIO_Init(GPIOB, &GPIO_InitStructure);
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;// 将USART3 Rx的GPIO配置为浮空输入模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//	GPIO_Init(GPIOB, &GPIO_InitStructure);
+//    /*配置UART4引脚*/
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,ENABLE);//使能UART4的GPIO的时钟      UART4    TX_PC10, RX_PC11
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4,ENABLE);//使能UART4的外设的时钟
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;// 将UART4 Tx的GPIO配置为推挽复用模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIO_Init(GPIOC, &GPIO_InitStructure);
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;// 将UART4 Rx的GPIO配置为浮空输入模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//	GPIO_Init(GPIOC, &GPIO_InitStructure);
+//    /*配置UART5引脚*/
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD,ENABLE);//使能UART5的GPIO的时钟      UART5   TX_PC12, RX_PD2
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5,ENABLE);//使能UART5的外设的时钟 
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;// 将UART5 Tx的GPIO配置为推挽复用模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIO_Init(GPIOC, &GPIO_InitStructure);
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;// 将UART5 Rx的GPIO配置为浮空输入模式
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//	GPIO_Init(GPIOD, &GPIO_InitStructure);
 	
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2,ENABLE);
-	USART_DeInit(USART2); 
-	
-	//	/*配置USART1模式*/
+	/*配置USART1模式*/
 	USART_InitStructure.USART_BaudRate = 230400;                               	//波特率设置为9600
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
@@ -49,7 +95,7 @@ void USART_InIt_PeiZhi(void)
 	USART_Cmd(USART1, ENABLE);																								//使能USART1外设
 	USART_ClearITPendingBit(USART1, USART_IT_RXNE);                           //清除中断标志位
 	USART_ClearITPendingBit(USART1, USART_IT_TC);                           	//清除中断标志位
-	
+	/*配置USART2模式*/
 	USART_InitStructure.USART_BaudRate = 9600;                               	//波特率设置为9600
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
@@ -62,6 +108,45 @@ void USART_InIt_PeiZhi(void)
 	USART_Cmd(USART2, ENABLE);																								//使能USART2外设
 	USART_ClearITPendingBit(USART2, USART_IT_RXNE);                           //清除中断标志位
 	USART_ClearITPendingBit(USART2, USART_IT_TC);                           	//清除中断标志位
+//    /*配置USART3模式*/
+//    USART_InitStructure.USART_BaudRate = 230400;                               	//波特率设置为230400
+//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
+//	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
+//	USART_InitStructure.USART_Parity = USART_Parity_No;                       //不设置奇偶校验位	
+//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //不采用硬件流
+//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;						//设置串口为全双工通讯
+//	USART_Init(USART3, &USART_InitStructure);																	//向寄存器写入配置参数
+//	USART_ITConfig(USART3, USART_IT_RXNE ,ENABLE);														//打开USART3的串口接收中断
+//	USART_ITConfig(USART3, USART_IT_TC ,ENABLE);															//打开USART3的串口发送中断
+//	USART_Cmd(USART3, ENABLE);																								//使能USART3外设
+//	USART_ClearITPendingBit(USART3, USART_IT_RXNE);                           //清除中断标志位
+//	USART_ClearITPendingBit(USART3, USART_IT_TC);                           	//清除中断标志位
+//    /*配置UART4模式*/
+//    USART_InitStructure.USART_BaudRate = 230400;                               	//波特率设置为230400
+//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
+//	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
+//	USART_InitStructure.USART_Parity = USART_Parity_No;                       //不设置奇偶校验位	
+//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //不采用硬件流
+//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;						//设置串口为全双工通讯
+//	USART_Init(UART4, &USART_InitStructure);																	//向寄存器写入配置参数
+//	USART_ITConfig(UART4, USART_IT_RXNE ,ENABLE);														//打开UART4的串口接收中断
+//	USART_ITConfig(UART4, USART_IT_TC ,ENABLE);															//打开UART4的串口发送中断
+//	USART_Cmd(UART4, ENABLE);																								//使能UART4外设
+//	USART_ClearITPendingBit(UART4, USART_IT_RXNE);                           //清除中断标志位
+//	USART_ClearITPendingBit(UART4, USART_IT_TC);                           	//清除中断标志位
+//    /*配置UART5模式*/
+//    USART_InitStructure.USART_BaudRate = 230400;                               	//波特率设置为230400
+//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;               //配置串口传输字节长度为8位
+//	USART_InitStructure.USART_StopBits = USART_StopBits_1;                    //配置停止位为1
+//	USART_InitStructure.USART_Parity = USART_Parity_No;                       //不设置奇偶校验位	
+//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //不采用硬件流
+//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;						//设置串口为全双工通讯
+//	USART_Init(UART5, &USART_InitStructure);																	//向寄存器写入配置参数
+//	USART_ITConfig(UART5, USART_IT_RXNE ,ENABLE);														//打开UART5的串口接收中断
+//	USART_ITConfig(UART5, USART_IT_TC ,ENABLE);															//打开UART5的串口发送中断
+//	USART_Cmd(UART5, ENABLE);																								//使能UART5外设
+//	USART_ClearITPendingBit(UART5, USART_IT_RXNE);                           //清除中断标志位
+//	USART_ClearITPendingBit(UART5, USART_IT_TC);                           	//清除中断标志位
 }
 #endif
 
@@ -100,6 +185,93 @@ void USART1_IRQHandler(void)    //host connect to PC
     }
 }
 #endif
+/************************ 串口2中断 *************************/
+#if 1
+void USART2_IRQHandler(void)    //host connect to slave
+{
+    u8 RX_i;
+    //判断现在的中断类型
+    if(USART_GetITStatus(USART2,USART_IT_RXNE)== SET)
+    {
+        /*  */
+        if(AnWeiSouXun_Flag>0)//大于0时等待10ms未收到数据后启动下一次发送，如果收到返回数据则重新计时
+        {
+            AnWeiSouXun_Time=1;//收到返回数据则重新计时
+            if(AnWeiSouXun_Flag>10000)//大于10000为等待分机返回模式，这里也表示还未收到过返回数据
+            {
+                AnWeiSouXun_Flag-=10000;//收到返回数据标志
+            }
+        }
+        if(RxData2==0xa5)
+        {
+            for(RX_i=0;RX_i<5;RX_i++)
+            {
+                if(Slave_RxHuanCun_i[RX_i]==0)
+                {
+                    Slave_RxHuanCun_i[RX_i]=3;
+                    break;
+                }
+            }
+        }
+        RxData2=USART_ReceiveData(USART2);												//读接收寄存器
+        Slave_RecvData(RxData2); 
+        USART_ClearITPendingBit(USART2, USART_IT_RXNE);             //清除中断标志位
+    }
+    if(USART_GetITStatus(USART2,USART_IT_TC)== SET)
+    {
+      ZhongDuan_TX_Flag[1]=1;
+			USART_ClearITPendingBit(USART2, USART_IT_TC);              	//清除中断标志位
+    }
+} 
+#endif
+///************************ 串口3中断 *************************/
+//#if 1
+//void USART3_IRQHandler(void)
+//{
+//    //判断现在的中断类型
+//    if(USART_GetITStatus(USART3,USART_IT_RXNE)== SET)
+//    {
+//        USART_ClearITPendingBit(USART3, USART_IT_RXNE);             //清除接收中断标志位
+//    }
+//    if(USART_GetITStatus(USART3,USART_IT_TC)== SET)
+//    {
+//        ZhongDuan_TX_Flag[2]=1;
+//		USART_ClearITPendingBit(USART3, USART_IT_TC);              	//清除发送中断标志位
+//    }
+//}
+//#endif
+///************************ 串口4中断 *************************/
+//#if 1
+//void UART4_IRQHandler(void)
+//{
+//    //判断现在的中断类型
+//    if(USART_GetITStatus(UART4,USART_IT_RXNE)== SET)
+//    {
+//        USART_ClearITPendingBit(UART4, USART_IT_RXNE);             //清除接收中断标志位
+//    }
+//    if(USART_GetITStatus(UART4,USART_IT_TC)== SET)
+//    {
+//        ZhongDuan_TX_Flag[3]=1;
+//		USART_ClearITPendingBit(UART4, USART_IT_TC);              	//清除发送中断标志位
+//    }
+//}
+//#endif
+///************************ 串口5中断 *************************/
+//#if 1
+//void UART5_IRQHandler(void)
+//{
+//    //判断现在的中断类型
+//    if(USART_GetITStatus(UART5,USART_IT_RXNE)== SET)
+//    {
+//        USART_ClearITPendingBit(UART5, USART_IT_RXNE);             //清除接收中断标志位
+//    }
+//    if(USART_GetITStatus(UART5,USART_IT_TC)== SET)
+//    {
+//        ZhongDuan_TX_Flag[4]=1;
+//		USART_ClearITPendingBit(UART5, USART_IT_TC);              	//清除发送中断标志位
+//    }
+//}
+//#endif
 /********************* 串口1接收PC数据 **********************/
 #if 1
 void PC_RecvData(u8 ZhuJi_Data)
@@ -155,45 +327,7 @@ void PC_ProcessRecvData(void)
 }
 #endif
 
-/************************ 串口2中断 *************************/
-#if 1
-void USART2_IRQHandler(void)    //host connect to slave
-{
-    u8 RX_i;
-    //判断现在的中断类型
-    if(USART_GetITStatus(USART2,USART_IT_RXNE)== SET)
-    {
-        /*  */
-        if(AnWeiSouXun_Flag>0)//大于0时等待10ms未收到数据后启动下一次发送，如果收到返回数据则重新计时
-        {
-            AnWeiSouXun_Time=1;//收到返回数据则重新计时
-            if(AnWeiSouXun_Flag>10000)//大于10000为等待分机返回模式，这里也表示还未收到过返回数据
-            {
-                AnWeiSouXun_Flag-=10000;//收到返回数据标志
-            }
-        }
-        if(RxData2==0xa5)
-        {
-            for(RX_i=0;RX_i<5;RX_i++)
-            {
-                if(Slave_RxHuanCun_i[RX_i]==0)
-                {
-                    Slave_RxHuanCun_i[RX_i]=3;
-                    break;
-                }
-            }
-        }
-        RxData2=USART_ReceiveData(USART2);												//读接收寄存器
-        Slave_RecvData(RxData2); 
-        USART_ClearITPendingBit(USART2, USART_IT_RXNE);             //清除中断标志位
-    }
-    if(USART_GetITStatus(USART2,USART_IT_TC)== SET)
-    {
-      ZhongDuan_TX_Flag[1]=1;
-			USART_ClearITPendingBit(USART2, USART_IT_TC);              	//清除中断标志位
-    }
-} 
-#endif
+
 /******************** 串口2接收从机数据 *********************/
 #if 1
 void Slave_RecvData(u8 ZhuJi2_Data)  //ZhuJi2_Data   --->    Slave_RxHuanCun
@@ -294,6 +428,10 @@ void Num_Data(USART_TypeDef* USARTx,long num)
 		ZhongDuan_TX_Flag[1]=0;
 	if(USARTx==USART3)
 		ZhongDuan_TX_Flag[2]=0;
+	if(USARTx==UART4)
+		ZhongDuan_TX_Flag[3]=0;
+	if(USARTx==UART5)
+		ZhongDuan_TX_Flag[4]=0;
   while (n!=0)
   { 
     c =num/js;

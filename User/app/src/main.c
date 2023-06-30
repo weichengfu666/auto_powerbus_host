@@ -20,11 +20,6 @@ int main(void)
 	USART_SendData( USART_SLAVE, 0x52);
 	USART_SendData( USART_SLAVE, 0x61);
     
-    USART_SendData( USART_PC, sizeof( SlaveArr ) >> 16 );
-    USART_SendData( USART_PC, sizeof( SlaveArr ) >> 8 );
-    USART_SendData( USART_PC, sizeof( SlaveArr ) );
-    
-
     while (1) 
     {
         ZongXunHuan(); 

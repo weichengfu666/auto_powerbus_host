@@ -1,0 +1,1 @@
+1、串口4、5的中断名一定要写对 UART4_IRQHandler、UART5_IRQHandler，否则编译器不会包错，运行时直接进入 Default_Handler异常的 （B    .）

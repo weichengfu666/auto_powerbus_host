@@ -24,7 +24,7 @@
 #define FLASH_PARAM_ERR		3	/* 函数参数错误 */
 
 //配置flash属性：设置有效flash地址范围，单次可写入最大页数 
-#define FLASH_STARTADDR 0X08020000      //可写入flash的起始地址
+#define FLASH_STARTADDR 0X08010000      //可写入flash的起始地址
 #define PAGE_SIZE 4                     //单次可写入最大页数
 
 uint8_t readFlashStr ( uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize );    //读Flash
